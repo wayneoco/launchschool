@@ -1,4 +1,4 @@
-"Wayne" + " " + "Olson"
+puts "Wayne" + " " + "Olson"
 
 thousands = 5678 / 1000
 puts "thousands: #{thousands}"
