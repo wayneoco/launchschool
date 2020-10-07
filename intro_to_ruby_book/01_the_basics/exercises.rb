@@ -22,3 +22,9 @@ movies = {
 }
 
 movies.each { |name, year| puts "#{year}" }
+
+puts "Exercise 04"
+
+dates = ["1985", "1984", "2003"]
+
+dates.each { |year| puts "#{year}" }
