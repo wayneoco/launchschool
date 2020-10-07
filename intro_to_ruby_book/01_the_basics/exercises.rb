@@ -21,6 +21,4 @@ movies = {
 	"Last Samurai" => "2003"
 }
 
-movies.each do |name, year|
-	puts "#{year}"
-end
+movies.each { |name, year| puts "#{year}" }
