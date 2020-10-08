@@ -82,4 +82,4 @@ puts "Exercise 06"
 
 puts 1.27**2
 puts 4.5678**2
-puts 8.142**2
+puts 8.142**2 
