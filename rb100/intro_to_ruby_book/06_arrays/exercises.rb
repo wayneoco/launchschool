@@ -8,7 +8,7 @@ number = gets.chomp.to_i
 
 loop do
 	if arr.include?(number)
-		puts "Amazing! You guess it: #{number} is one of the numbers I'm thinking of."
+		puts "Amazing! You guessed it: #{number} is one of the numbers I'm thinking of."
 		break
 	else
 		puts "Nope! Would you like to try again?"
@@ -30,4 +30,16 @@ loop do
 	end
 end
 
-arr = [[b, 1], [b, 2], [b, 3], [a, 1], [a, 2], [a, 3]]
+# Exercise 03
+
+arr = [["test", "hello", "world"], ["example", "men"]]
+arr.last.first
+
+# Exercise 07
+
+arr = ["tacos", "cheese", "tomatoes", "tortillas"]
+
+for.each_with_index in |i| do
+	i = arr
+	puts i + ": index = " + arr.index
+end
