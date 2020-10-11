@@ -8,7 +8,7 @@ number = gets.chomp.to_i
 
 loop do
 	if arr.include?(number)
-		puts "Amazing! You guessed it: #{number} is one of the numbers I'm thinking of."
+		puts "Amazing! You guessed it. #{number} is one of the numbers I'm thinking of."
 		break
 	else
 		puts "Nope! Would you like to try again?"
@@ -39,7 +39,25 @@ arr.last.first
 
 arr = ["tacos", "cheese", "tomatoes", "tortillas"]
 
-for.each_with_index in |i| do
-	i = arr
-	puts i + ": index = " + arr.index
+arr.each_with_index do |val, idx|
+	puts "#{idx}: #{val}"
 end
+
+# Exercise 08
+
+arr1 = [1, 2, 3, 4, 5]
+
+arr2 = arr1.map { |a| a + 2 }
+
+p arr1
+p arr2
+
+arr = [1, 2, 3, 4, 5]
+new_arr = []
+
+arr.each do |n|
+	new_arr << n + 2
+end
+
+p arr
+p new_arr
