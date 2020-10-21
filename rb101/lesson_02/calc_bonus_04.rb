@@ -1,4 +1,6 @@
-require_relative 'calc_config'
+require 'yaml'
+MESSAGES = YAML.load_file('calc_config.yml')
+puts MESSAGES.inspect
 
 def prompt(message)
   puts "=> #{message}"
