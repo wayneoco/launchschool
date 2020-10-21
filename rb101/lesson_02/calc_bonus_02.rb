@@ -28,7 +28,7 @@ def operation_to_message(op)
   end
 end
 
-num01 = nil
+num01 = nil 
 num02 = nil
 
 prompt('Welcome to Calculator!')
