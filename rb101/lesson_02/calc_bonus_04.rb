@@ -93,7 +93,7 @@ loop do # main loop
   
   prompt("#{operation_to_message(operator)}...")
   
-  prompt(MESSAGES['result'])
+  prompt(MESSAGES['result'] + "#{result}")
   prompt(MESSAGES['repeat'])
   answer = gets.chomp.downcase
   break unless answer.start_with?('y')
