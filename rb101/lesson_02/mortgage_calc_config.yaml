@@ -1,0 +1,20 @@
+welcome: 'Welcome to Mortgage Calculator'
+purch_or_refi: 'Is this for a purchase or a refinance?'
+error_valid_choice: "Whoops! Sorry but that's not a valid choice. Please try again."
+error_valid_integer: "Sorry, but that's not a valid number. Please enter a valid integer."
+error_valid_apr: "Sorry, but that's not a valid APR. Please try again."
+purchase: "What's the purchase price of the home?"
+refi: "What's the amount of the loan you'll be refinancing?"
+down_payment: 'How much will you be putting down as a down payment?'
+loan_amount: 'Great. Your loan amount is: '
+apr: "What's Annual Percentage Rate (APR) of your loan?"
+duration_years: 'Over how many years will you be paying back this loan?'
+result_p_and_i: 'Your monthly payment is: '
+total_monthly_payment: 'Would you like to calculate your total monthly payment with taxes, insurance and, if applicable, HOA dues? (y/n)'
+property_taxes: 'What are the annual property taxes?'
+insurance: "What's the annual cost for your homeowner's insurance policy?"
+hoa?: 'Is there an HOA?'
+hoa_dues: 'How much are the HOA dues?'
+hoa_frequency: 'How often do you pay those dues? 1 = monthly; 2 = quarterly; 3 = annually'
+result_total_monthly_payment_no_hoa: 'Your total monthly payment including property taxes and insurance is:'
+result_total_monthly_payment_hoa: 'Your total monthly payment including property taxes, insurance and HOA dues is:'
