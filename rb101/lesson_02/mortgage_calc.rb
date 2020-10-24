@@ -1,212 +1,214 @@
 require 'yaml'
 MESSAGES = YAML.load_file('mortgage_calc_config.yaml')
 
+purchase_price = ''
+down_payment = ''
+loan_amount = ''
+interest_rate_monthly = ''
+term_months = ''
+calculate_total_monthly_payment = ''
+property_taxes = ''
+insurance = ''
+hoa = ''
+hoa_dues = ''
+hoa_frequency = ''
+hoa_monthly_payment = ''
+
 def prompt(message)
   puts "=> #{message}"
 end
 
-def valid_integer?(input)
-  input.each_char { |x| input.delete!(x) if /^[[:punct:]]$/ =~ x }
-  input.match?(/^\d+$/)
+def valid_currency?(input)
+  input.match?(/^\$?\d{1,3}\,?\d{1,3}?\,?\d{1,3}?\,?\d{1,3}?\.?\d+?$/) &&
+    !input.match?(/^\$?[0]\d*?$/)
 end
 
-def valid_downpayment?(input)
-  if input.include?("%")
-    input.match?(/^\d{1,2}\.?\d+?\%$/)
-  elsif input.each_char { |x| input.delete!(x) if /^[[:punct:]]$/ =~ x }
-    input.match?(/^\d+$/)
-  end
+def valid_down_payment?(input)
+  (input.match?(/^\$?\d{1,3}\,?\d{1,3}?\,?\d{1,3}?\,?\d{1,3}?\.?\d+?$/) &&
+    !input.start_with?(/^\$?\0\0$/)) ||
+    input.match?(/^\d{1,2}\.?\d+?\%?$/)
 end
 
 def valid_apr?(input)
-  input =~ /^\d{1,2}\.\d+?\%?$/
+  input.match?(/^\d{1,2}\.?\d+?\%?$/)
 end
 
-# initialize block variables
+def valid_term?(input)
+  input.match?(/^\d{1,2}\.?\d+?$/)
+end
 
-purchase_price = nil
-down_payment = nil
-loan_amount = nil
-interest_rate_monthly = nil
-loan_months = nil
-property_taxes = nil
-insurance = nil
-hoa = nil
-hoa_dues = nil
-hoa_frequency = nil
-hoa_monthly_payment = nil
+def remove_punct(num)
+  num.each_char do |x|
+    if /^[[:punct:]]$/ =~ x
+      num.delete!(x) unless x == '.'
+    end
+  end
+end
 
-prompt(MESSAGES['welcome'])
+prompt(MESSAGES['welcome_01'])
+prompt(MESSAGES['welcome_02'])
 
 loop do
-  # get purchase (purchase price & down payment) or refi input
-  prompt(MESSAGES['intro_01'])
-  prompt(MESSAGES['intro_02'])
+  prompt(MESSAGES['purchase_or_refi?'])
   purchase_or_refi = gets.chomp
-
-  if purchase_or_refi.downcase.start_with?("p")
-    prompt(MESSAGES['purchase'])
-    purchase_price = gets.chomp
-
+  if purchase_or_refi.downcase == "purchase" ||
+     purchase_or_refi.downcase == "p"
     loop do
-      if valid_integer?(purchase_price)
+      prompt(MESSAGES['purchase_amount?'])
+      purchase_price = gets.chomp
+      if valid_currency?(purchase_price)
+        purchase_price = remove_punct(purchase_price).to_f
         break
       else
-        prompt(MESSAGES['error_valid_integer'])
-        purchase_price = gets.chomp
+        prompt(MESSAGES['error_valid_number'])
       end
     end
-
-    prompt(MESSAGES['down_payment'])
-    down_payment = gets.chomp
-
     loop do
-      if valid_integer?(down_payment)
+      prompt(MESSAGES['down_payment_amount?'])
+      down_payment = gets.chomp
+      if valid_down_payment?(down_payment)
         if down_payment.include?("%")
-          down_payment =
-            (down_payment.delete("%").to_f / 100) * purchase_price.to_i
+          down_payment = (
+            (remove_punct(down_payment).to_f / 100) * purchase_price
+          )
+        else
+          down_payment = remove_punct(down_payment).to_f
         end
-        loan_amount = (purchase_price.to_i - down_payment.to_i)
+        loan_amount = (purchase_price - down_payment)
         break
       else
-        prompt(MESSAGES['error_valid_integer'])
-        down_payment = gets.chomp
+        prompt(MESSAGES['error_valid_number'])
       end
     end
-
-    break
-
-  elsif purchase_or_refi.downcase.start_with?("r")
-    prompt(MESSAGES['refi'])
-    loan_amount = gets.chomp
-
+  elsif purchase_or_refi.downcase == "refinance" ||
+        purchase_or_refi.downcase == "r"
     loop do
-      if valid_integer?(loan_amount)
+      prompt(MESSAGES['refi'])
+      loan_amount = gets.chomp
+      if valid_currency?(loan_amount)
+        loan_amount = remove_punct(loan_amount).to_f
         break
       else
-        prompt(MESSAGES['error_valid_integer'])
-        loan_amount = gets.chomp
+        prompt(MESSAGES['error_valid_number'])
       end
     end
-
     break
-
   else
     prompt(MESSAGES['error_valid_choice'])
   end
 end
 
-prompt(MESSAGES['apr'])
-apr = gets.chomp
-
 loop do
+  prompt(MESSAGES['apr'])
+  apr = gets.chomp
   if valid_apr?(apr)
-    interest_rate_monthly = (apr.to_f / 12) / 100
+    apr = remove_punct(apr).to_f
+    interest_rate_monthly = (apr / 12) / 100
     break
   else
     prompt(MESSAGES['error_valid_apr'])
-    apr = gets.chomp
   end
 end
 
-prompt(MESSAGES['duration_years'])
-loan_years = gets.chomp
-
 loop do
-  if valid_integer?(loan_years)
-    loan_months = (loan_years.to_i * 12)
+  prompt(MESSAGES['term'])
+  term_years = gets.chomp
+  if valid_term?(term_years)
+    term_months = remove_punct(term_years).to_f * 12
     break
   else
-    prompt(MESSAGES['error_valid_integer'])
-    loan_years = gets.chomp
+    prompt(MESSAGES['error_valid_number'])
   end
 end
 
 p_and_i =
-  loan_amount.to_i * (
+  loan_amount * (
     interest_rate_monthly / (
-      1 - (1 + interest_rate_monthly)**(-loan_months.to_i)
+      1 - (1 + interest_rate_monthly)**(-term_months)
     )
   )
 
 prompt(MESSAGES['result_p_and_i'])
 puts "$" + p_and_i.round(2).to_s
 
-prompt(MESSAGES['total_monthly_payment?'])
-answer = gets.chomp
-
 loop do
-  if answer.start_with?("n") || answer.start_with?("y")
+  prompt(MESSAGES['calculate_total_monthly_payment?'])
+  calculate_total_monthly_payment = gets.chomp
+  if calculate_total_monthly_payment == "yes" ||
+     calculate_total_monthly_payment == "y" ||
+     calculate_total_monthly_payment == "no" ||
+     calculate_total_monthly_payment == "n"
     break
   else
     prompt(MESSAGES['error_valid_choice'])
-    answer = gets.chomp
   end
 end
 
-if answer.start_with?("y")
-
+if calculate_total_monthly_payment == "yes" ||
+   calculate_total_monthly_payment == "y"
   loop do
-    prompt(MESSAGES['property_taxes'])
+    prompt(MESSAGES['property_taxes?'])
     property_taxes = gets.chomp
-    if valid_integer?(property_taxes)
+    if valid_currency?(property_taxes)
+      property_taxes = remove_punct(property_taxes).to_f
       break
     else
-      prompt(MESSAGES['error_valid_integer'])
+      prompt(MESSAGES['error_valid_number'])
     end
   end
-
   loop do
-    prompt(MESSAGES['insurance'])
+    prompt(MESSAGES['insurance?'])
     insurance = gets.chomp
-    break if valid_integer?(insurance)
-    prompt(MESSAGES['error_valid_integer'])
+    if valid_currency?(insurance)
+      insurance = remove_punct(insurance).to_f
+      break
+    else
+      prompt(MESSAGES['error_valid_number'])
+    end
   end
-
   loop do
     prompt(MESSAGES['hoa?'])
     hoa = gets.chomp
-    break if hoa.start_with?("y") || hoa.start_with?("n")
-    prompt(MESSSAGES['error_valid_choice'])
-  end
-
-  if hoa.start_with?("y")
-    prompt(MESSAGES['hoa_dues'])
-    hoa_dues = gets.chomp
-
-    loop do
-      break if valid_integer?(hoa_dues)
-      prompt(MESSAGES['error_valid_integer'])
-      hoa_dues = gets.chomp
+    if hoa == "yes" || hoa == "y"
+      hoa = "y"
+      loop do
+        prompt(MESSAGES['hoa_dues?'])
+        hoa_dues = gets.chomp
+        if valid_number?(hoa_dues)
+          hoa_dues = remove_punct(hoa_dues).to_f
+          break
+        else
+          prompt(MESSAGES['error_valid_number'])
+        end
+      end
+    elsif hoa == "no" || hoa == "n"
+      hoa = "n"
+      break
+    else
+      prompt(MESSSAGES['error_valid_choice'])
     end
-
-    prompt(MESSAGES['hoa_frequency'])
-    hoa_frequency = gets.chomp
-
+  end
+  if hoa == "y"
     loop do
-      break if ['1', '2', '3'].include?(hoa_frequency)
-      prompt(MESSAGES['error_valid_choice'])
+      prompt(MESSAGES['hoa_frequency?'])
       hoa_frequency = gets.chomp
+      if ['1', '2', '3'].include?(hoa_frequency)
+        hoa_monthly_payment = hoa_dues if hoa_frequency == '1'
+        hoa_monthly_payment = hoa_dues / 3 if hoa_frequency == '2'
+        hoa_monthly_payment = hoa_dues / 12 if hoa_frequency == '3'
+        break
+      else
+        prompt(MESSAGES['error_valid_choice'])
+      end
     end
-
-    case hoa_frequency
-    when '1'
-      hoa_monthly_payment = hoa_dues.to_i
-    when '2'
-      hoa_monthly_payment = hoa_dues.to_i / 3
-    when '3'
-      hoa_monthly_payment = hoa_dues.to_i / 12
-    end
-
   end
-
-  if hoa.start_with?("y")
+  if hoa == "y"
     prompt(MESSAGES['result_total_monthly_payment_hoa'])
     result_total_monthly_payment =
       "$" + (
         p_and_i +
-        (property_taxes.to_i / 12) +
-        (insurance.to_i / 12) +
+        (property_taxes / 12) +
+        (insurance / 12) +
         hoa_monthly_payment
       ).round(2).to_s
     puts result_total_monthly_payment
@@ -214,11 +216,10 @@ if answer.start_with?("y")
     prompt(MESSAGES['result_total_monthly_payment_no_hoa'])
     result_total_monthly_payment_no_hoa =
       "$" + (
-        p_and_i + (property_taxes.to_i / 12) + (insurance.to_i / 12)
+        p_and_i +
+        (property_taxes / 12) +
+        (insurance / 12)
       ).round(2).to_s
     puts result_total_monthly_payment_no_hoa
   end
-
-else
-  prompt(MESSAGES['goodbye'])
 end
