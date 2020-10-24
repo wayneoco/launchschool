@@ -6,7 +6,10 @@ error_valid_number: "Sorry, but that's not a valid number."
 error_valid_apr: "Sorry, but that's not a valid APR."
 purchase_amount?: "What's the purchase price of the home?"
 refi_amount?: "What's the amount of the loan you'll be refinancing?"
-down_payment_amount?: 'How much will you be putting down as a down payment?'
+down_payment_amount?:
+  'How much will you be putting down as a down payment?
+  You can enter either a specific dollar amount or a percentage.'
+down_payment_clarify?: 'Just to clarfiy: Is that your down payment as a percentage? (y/n)'
 loan_amount: 'Great. Your loan amount is: '
 apr: "What's Annual Percentage Rate (APR) of your loan?"
 term: 'Over how many years will you be paying back this loan?'

@@ -19,18 +19,34 @@ def prompt(message)
 end
 
 def valid_currency?(input)
-  input.match?(/^\$?\d{1,3}\,?\d{1,3}?\,?\d{1,3}?\,?\d{1,3}?\.?\d+?$/) &&
-    !input.match?(/^\$?[0]\d*?$/)
+  input.match?(
+    %r{
+      (
+        (^\$?\d+(\.?\d{2})?$)|
+        (^\$?\d{1,3}(\.?\d{2})?$)|
+        (^\$?\d{1,3}(\,\d{3})*(\.?\d{2})?$)
+      )
+    }x
+  ) &&
+    !input.match?(/^\$?[0]\.?\d*?$/)
 end
 
 def valid_down_payment?(input)
-  (input.match?(/^\$?\d{1,3}\,?\d{1,3}?\,?\d{1,3}?\,?\d{1,3}?\.?\d+?$/) &&
-    !input.start_with?(/^\$?\0\0$/)) ||
-    input.match?(/^\d{1,2}\.?\d+?\%?$/)
+  input.match?(
+    %r{
+      (
+        (^\$?\d+(\.?\d{2})?$)|
+        (^\$?\d{1,3}(\.?\d{2})?$)|
+        (^\$?\d{1,3}(\,\d{3})*(\.?\d{2})?$)
+      )
+    }x
+  ) &&
+    !input.match?(/^\$?(00)\.?\d+$/) ||
+    input.match?(/^\d{1,2}(\.\d{1,2})?\%?$/)
 end
 
 def valid_apr?(input)
-  input.match?(/^\d{1,2}\.?\d+?\%?$/)
+  input.match?(/^\d{1,2}(\.\d{1,3})?\%?$/)
 end
 
 def valid_term?(input)
@@ -67,7 +83,8 @@ loop do
       prompt(MESSAGES['down_payment_amount?'])
       down_payment = gets.chomp
       if valid_down_payment?(down_payment)
-        if down_payment.include?("%")
+        if (/^\d{1,2}(\.\d{1,2})?\%?$/).match?(down_payment)
+          down_payment.delete!("%")
           down_payment = (
             (remove_punct(down_payment).to_f / 100) * purchase_price
           )
@@ -80,10 +97,11 @@ loop do
         prompt(MESSAGES['error_valid_number'])
       end
     end
+    break
   elsif purchase_or_refi.downcase == "refinance" ||
         purchase_or_refi.downcase == "r"
     loop do
-      prompt(MESSAGES['refi'])
+      prompt(MESSAGES['refi_amount?'])
       loan_amount = gets.chomp
       if valid_currency?(loan_amount)
         loan_amount = remove_punct(loan_amount).to_f
@@ -174,13 +192,14 @@ if calculate_total_monthly_payment == "yes" ||
       loop do
         prompt(MESSAGES['hoa_dues?'])
         hoa_dues = gets.chomp
-        if valid_number?(hoa_dues)
+        if valid_currency?(hoa_dues)
           hoa_dues = remove_punct(hoa_dues).to_f
           break
         else
           prompt(MESSAGES['error_valid_number'])
         end
       end
+      break
     elsif hoa == "no" || hoa == "n"
       hoa = "n"
       break
@@ -193,9 +212,14 @@ if calculate_total_monthly_payment == "yes" ||
       prompt(MESSAGES['hoa_frequency?'])
       hoa_frequency = gets.chomp
       if ['1', '2', '3'].include?(hoa_frequency)
-        hoa_monthly_payment = hoa_dues if hoa_frequency == '1'
-        hoa_monthly_payment = hoa_dues / 3 if hoa_frequency == '2'
-        hoa_monthly_payment = hoa_dues / 12 if hoa_frequency == '3'
+        case hoa_frequency
+        when '1'
+          hoa_monthly_payment = hoa_dues
+        when '2'
+          hoa_monthly_payment = hoa_dues / 3
+        when '3'
+          hoa_monthly_payment = hoa_dues / 12
+        end
         break
       else
         prompt(MESSAGES['error_valid_choice'])
