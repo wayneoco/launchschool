@@ -20,8 +20,8 @@ end
 
 def valid_currency?(input)
   # Uses regex to check for valid number combinations, with or without
-  # commas, decimals and dollar signs. Excludes 0 or answers that begin
-  # with 0, as well as negative numbers.
+  #   commas, decimals and dollar signs. Excludes 0 or answers that begin
+  #   with 0, as well as negative numbers.
   input.match?(
     %r{
       (
@@ -36,8 +36,8 @@ end
 
 def valid_down_payment?(input)
   # Nearly identical to the valid_currency? method above except that it
-  # alows for 0 as an answer, as well as percentages in lieu of specific
-  # dollar amounts
+  #   alows for 0 as input, as well as percentages in lieu of specific
+  #   dollar amounts.
   input.match?(
     %r{
       (
@@ -53,7 +53,7 @@ end
 
 def valid_apr?(input)
   # Uses regex to check for valid APR configurations, with or without
-  # the percent sign or a decimal.
+  #   the percent sign or a decimal.
   input.match?(/^\d{1,2}(\.\d{1,3})?\%?$/)
 end
 
@@ -64,9 +64,9 @@ end
 
 def remove_punct(num)
   # Removes non-letter and non-numeric characters and symbols, such as a
-  # dollar sign or comma, so that numeric strings can be converted to floats.
-  # This method is called only after numbers have been validated using
-  # the methods define above.
+  #   dollar sign or comma, so that numeric strings can be converted to floats.
+  #   This method is called only after numbers have been validated using
+  #   the methods defined above.
   num.each_char do |x|
     if /^[[:punct:]]$/ =~ x
       num.delete!(x) unless x == '.'
@@ -128,7 +128,6 @@ loop do
     prompt(MESSAGES['error_valid_choice'])
   end
 end
-
 loop do
   prompt(MESSAGES['apr'])
   apr = gets.chomp
@@ -140,7 +139,6 @@ loop do
     prompt(MESSAGES['error_valid_apr'])
   end
 end
-
 loop do
   prompt(MESSAGES['term'])
   term_years = gets.chomp
@@ -151,7 +149,6 @@ loop do
     prompt(MESSAGES['error_valid_number'])
   end
 end
-
 p_and_i =
   loan_amount * (
     interest_rate_monthly / (
