@@ -74,116 +74,166 @@ def remove_punct(num)
   end
 end
 
-prompt(MESSAGES['welcome_01'])
-prompt(MESSAGES['welcome_02'])
+def show_welcome
+  prompt(MESSAGES['welcome_01'])
+  prompt(MESSAGES['welcome_02'])
+end
 
-loop do
-  prompt(MESSAGES['purchase_or_refi?'])
-  purchase_or_refi = gets.chomp
-  if purchase_or_refi.downcase == "purchase" ||
-     purchase_or_refi.downcase == "p"
-    loop do
-      prompt(MESSAGES['purchase_amount?'])
-      purchase_price = gets.chomp
-      if valid_currency?(purchase_price)
-        purchase_price = remove_punct(purchase_price).to_f
-        break
-      else
-        prompt(MESSAGES['error_valid_number'])
-      end
+def get_purchase_price
+  loop do
+    prompt(MESSAGES['purchase_amounbt?'])
+    purchase_price = gets.chomp
+    if valid_currency?(purchase_price)
+      purchase_price = remove_puct(purchase_price).to_f
+      break
+    else
+      prompt(MESSAGES['error_valid_number'])
     end
-    loop do
-      prompt(MESSAGES['down_payment_amount?'])
-      down_payment = gets.chomp
-      if valid_down_payment?(down_payment)
-        if (/^\d{1,2}(\.\d{1,2})?\%?$/).match?(down_payment)
-          down_payment.delete!("%")
-          down_payment = (
-            (remove_punct(down_payment).to_f / 100) * purchase_price
-          )
-        else
-          down_payment = remove_punct(down_payment).to_f
-        end
-        loan_amount = (purchase_price - down_payment)
-        break
-      else
-        prompt(MESSAGES['error_valid_number'])
-      end
-    end
-    break
-  elsif purchase_or_refi.downcase == "refinance" ||
-        purchase_or_refi.downcase == "r"
-    loop do
-      prompt(MESSAGES['refi_amount?'])
-      loan_amount = gets.chomp
-      if valid_currency?(loan_amount)
-        loan_amount = remove_punct(loan_amount).to_f
-        break
-      else
-        prompt(MESSAGES['error_valid_number'])
-      end
-    end
-    break
-  else
-    prompt(MESSAGES['error_valid_choice'])
   end
 end
-loop do
-  prompt(MESSAGES['apr'])
-  apr = gets.chomp
-  if valid_apr?(apr)
-    apr = remove_punct(apr).to_f
-    interest_rate_monthly = (apr / 12) / 100
-    break
-  else
-    prompt(MESSAGES['error_valid_apr'])
+
+def get_down_payment
+  loop do
+    prompt(MESSAGES['down_payment_amount?'])
+    down_payment = gets.chomp
+    if valid_down_payment?(down_payment)
+      if (/^\d{1,2}(\.\d{1,2})?\%?$/).match?(down_payment)
+        down_payment.delete!("%")
+        down_payment = (
+          (remove_punct(down_payment).to_f / 100) * purchase_price
+        )
+      else
+        down_payment = remove_punct(down_payment).to_f
+      end
+      loan_amount = (purchase_price - down_payment)
+      break
+    else
+      prompt(MESSAGES['error_valid_number'])
+    end
   end
 end
-loop do
-  prompt(MESSAGES['term'])
-  term_years = gets.chomp
-  if valid_term?(term_years)
-    term_months = remove_punct(term_years).to_f * 12
-    break
-  else
-    prompt(MESSAGES['error_valid_number'])
+
+def get_refi_amount
+  loop do
+    prompt(MESSAGES['refi_amount?'])
+    loan_amount = gets.chomp
+    if valid_currency?(loan_amount)
+      loan_amount = remove_punct(loan_amount).to_f
+      break
+    else
+      prompt(MESSAGES['error_valid_number'])
+    end
   end
 end
-p_and_i =
+
+def get_loan_amount
+  loop do
+    prompt(MESSAGES['purchase_or_refi?'])
+    purchase_or_refi = gets.chomp
+      if purchase_or_refi.downcase == "purchase" ||
+        purchase_or_refi.downcase == "p"
+
+        get_purchase_amount
+
+        get_down_payment
+
+        break
+      elsif purchase_or_refi.downcase == "refinance" ||
+            purchase_or_refi.downcase == "r"
+
+        get_refi_amount
+
+        break
+      else
+        prompt(MESSAGES['error_valid_choice'])
+      end
+  end
+end
+
+def get_apr
+  loop do
+    prompt(MESSAGES['apr'])
+    apr = gets.chomp
+    if valid_apr?(apr)
+      apr = remove_punct(apr).to_f
+      interest_rate_monthly = (apr / 12) / 100
+      break
+    else
+      prompt(MESSAGES['error_valid_apr'])
+    end
+  end
+end
+
+def get_term
+  loop do
+    prompt(MESSAGES['term'])
+    term_years = gets.chomp
+    if valid_term?(term_years)
+      term_months = remove_punct(term_years).to_f * 12
+      break
+    else
+      prompt(MESSAGES['error_valid_number'])
+    end
+  end
+end
+
+def show_monthly_principal_and_interest
+  p_and_i =
   loan_amount * (
     interest_rate_monthly / (
       1 - (1 + interest_rate_monthly)**(-term_months)
     )
   )
+  prompt(MESSAGES['result_p_and_i'])
+  puts "$" + p_and_i.round(2).to_s
+end
 
-prompt(MESSAGES['result_p_and_i'])
-puts "$" + p_and_i.round(2).to_s
-
-loop do
-  prompt(MESSAGES['calculate_total_monthly_payment?'])
-  calculate_total_monthly_payment = gets.chomp
-  if calculate_total_monthly_payment == "yes" ||
-     calculate_total_monthly_payment == "y"
-    break
-  elsif calculate_total_monthly_payment == "no" ||
-        calculate_total_monthly_payment == "n"
-    prompt(MESSAGES['goodbye'])
-    exit!
-  else
-    prompt(MESSAGES['error_valid_choice'])
+def ask_calculate_total_monthly_payment
+  loop do
+    prompt(MESSAGES['calculate_total_monthly_payment?'])
+    calculate_total_monthly_payment = gets.chomp
+    if calculate_total_monthly_payment == "yes" ||
+       calculate_total_monthly_payment == "y"
+      break
+    elsif
+       calculate_total_monthly_payment == "no" ||
+       calculate_total_monthly_payment == "n"
+       prompt(MESSAGES['goodbye'])
+       exit!
+    else
+      prompt(MESSAGES['error_valid_choice'])
+    end
   end
 end
 
-loop do
-  prompt(MESSAGES['property_taxes?'])
-  property_taxes = gets.chomp
-  if valid_currency?(property_taxes)
-    property_taxes = remove_punct(property_taxes).to_f
-    break
-  else
-    prompt(MESSAGES['error_valid_number'])
+def get_property_taxes
+  loop do
+    prompt(MESSAGES['property_taxes?'])
+    property_taxes = gets.chomp
+    if valid_currency?(property_taxes)
+      property_taxes = remove_punct(property_taxes).to_f
+      break
+    else
+      prompt(MESSAGES['error_valid_number'])
+    end
   end
 end
+
+show_welcome
+
+get_loan_amount
+
+get_apr
+
+get_term
+
+show_monthly_principal_and_interest
+
+ask_calculate_total_monthly_payment
+
+# Program exits if user
+
+get_property_taxes
 loop do
   prompt(MESSAGES['insurance?'])
   insurance = gets.chomp
