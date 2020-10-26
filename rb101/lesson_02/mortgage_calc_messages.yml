@@ -1,6 +1,5 @@
 welcome_01: 'Welcome to Mortgage Calculator'
 welcome_02: "Let's calculate your monthly principal and interest."
-purchase_or_refi?: 'Is this for a purchase or a refinance?'
 error_invalid_choice: "Whoops! Sorry, but that's not a valid choice."
 error_invalid_number: "Sorry, but that's not a valid number."
 error_invalid_apr: "Sorry, but that's not a valid APR."
@@ -18,7 +17,5 @@ insurance?: "What's the annual cost for your homeowner's insurance policy?"
 hoa?: 'Is there an HOA?'
 hoa_dues?: 'How much are the HOA dues?'
 hoa_frequency?: 'How often do you pay those dues? 1 = monthly; 2 = quarterly; 3 = annually'
-result_total_monthly_payment_no_hoa: 'Your total monthly payment including property taxes and insurance is:'
-result_total_monthly_payment_hoa: 'Your total monthly payment including property taxes, insurance and HOA dues is:'
 use_again?: 'Would you like to use Mortgage Calculator again? (y/n)'
 goodbye: 'Okay. Thank you for using Morgage Calculator. Good-bye!'
