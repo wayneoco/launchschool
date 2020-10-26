@@ -87,7 +87,7 @@ def check_down_payment(down_payment)
   loop do
     puts <<~MSG
       => Hmmm. That looks unusually low.
-      => Are you sure you meant to enter #{down_payment}?
+      => Are you sure you meant to enter $#{down_payment}?
       MSG
     response = gets.chomp
     if response == 'yes' || response == 'y'
