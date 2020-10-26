@@ -260,7 +260,7 @@ loop do
     down_payment = get_down_payment
     break if /^.+\%$/.match?(down_payment)
     remove_symbols(down_payment)
-    if down_payment.to_i < 1000 || down_payment.to_i != 0
+    if down_payment.to_i < 1000 && down_payment.to_i != 0
       checked_down_payment = check_down_payment(down_payment)
       if checked_down_payment == 'y'
         prompt(MESSAGES['down_payment_check'])
