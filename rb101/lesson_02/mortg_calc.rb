@@ -247,6 +247,7 @@ loop do
 
   loop do
     down_payment = get_down_payment
+    break if /^.+\%$/.match?(down_payment)
     remove_punct(down_payment)
     if down_payment.to_i < 1000
       checked_down_payment = check_down_payment(down_payment)
@@ -300,5 +301,4 @@ loop do
     prompt(MESSAGES['goodbye'])
     exit!
   end
-
 end
