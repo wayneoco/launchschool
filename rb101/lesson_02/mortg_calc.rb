@@ -23,6 +23,8 @@ def valid_price?(input)
 end
 
 def valid_down_payment?(input)
+  # Checks for valid down payment expressed either as a dollar amount
+  #   or a percentage of the purchase price.
   input.match?(
     %r{
       (
@@ -44,10 +46,12 @@ def valid_term?(input)
   input.match?(/^\d{1,2}\.?\d+?$/)
 end
 
-def remove_punct(num)
+def remove_symbols(num)
+  # Removes '$' and ',' if present, so that the string
+  #   can be converted to a float.
   num.each_char do |x|
-    if /^[[:punct:]]$/ =~ x
-      num.delete!(x) unless x == '.'
+    if x == '$' || x == ','
+      num.delete!(x)
     end
   end
 end
@@ -57,7 +61,7 @@ def get_purchase_price
     prompt(MESSAGES['purchase_amount?'])
     purchase_price = gets.chomp
     if valid_price?(purchase_price)
-      return remove_punct(purchase_price).to_f
+      return remove_symbols(purchase_price).to_f
     else
       prompt(MESSAGES['error_invalid_number'])
     end
@@ -77,6 +81,9 @@ def get_down_payment
 end
 
 def check_down_payment(down_payment)
+  # This gets triggered if the down payment entered is under $1,000 but not $0.
+  #   Down payments are rarely sub-four figures (but can often be $0), so this
+  #   method asks the user to confirm if a sub-four figure down payment is entered.
   loop do
     puts <<~MSG
       => Hmmm. That looks unusually low.
@@ -93,11 +100,15 @@ def check_down_payment(down_payment)
   end
 end
 
-def format_down_payment(down_payment, purchase_price)
+def convert_down_payment(down_payment, purchase_price)
+  # Because this program allows the user to enter the down payment as either
+  #   a dollar amount or a percentage, this method converts the
+  #   down payment to a dollar amount if entered as a percentage, or leaves it
+  #   as is if entered as a dollar amount.
   if (/^\d{1,2}(\.\d{1,2})?\%?$/).match?(down_payment)
     (down_payment.delete!('%').to_f / 100) * purchase_price
   else
-    remove_punct(down_payment).to_f
+    remove_symbols(down_payment).to_f
   end
 end
 
@@ -110,7 +121,7 @@ def get_apr
     prompt(MESSAGES['apr'])
     apr = gets.chomp
     if valid_apr?(apr)
-      return remove_punct(apr).to_f / 100
+      return remove_symbols(apr).to_f / 100
     else
       prompt(MESSAGES['error_invalid_apr'])
     end
@@ -122,7 +133,7 @@ def get_term
     prompt(MESSAGES['term'])
     term_years = gets.chomp
     if valid_term?(term_years)
-      return remove_punct(term_years).to_f * 12
+      return remove_symbols(term_years).to_f * 12
     else
       prompt(MESSAGES['error_invalid_number'])
     end
@@ -134,7 +145,7 @@ def get_property_taxes
     prompt(MESSAGES['property_taxes?'])
     property_taxes = gets.chomp
     if valid_price?(property_taxes)
-      return remove_punct(property_taxes).to_f / 12
+      return remove_symbols(property_taxes).to_f / 12
     else
       prompt(MESSAGES['error_invalid_number'])
     end
@@ -146,7 +157,7 @@ def get_insurance
     prompt(MESSAGES['insurance?'])
     insurance = gets.chomp
     if valid_price?(insurance)
-      return remove_punct(insurance).to_f / 12
+      return remove_symbols(insurance).to_f / 12
     else
       prompt(MESSAGES['error_invalid_number'])
     end
@@ -172,7 +183,7 @@ def get_hoa_dues
     prompt(MESSAGES['hoa_dues?'])
     hoa_dues = gets.chomp
     if valid_price?(hoa_dues)
-      return remove_punct(hoa_dues).to_f
+      return remove_symbols(hoa_dues).to_f
     else
       prompt(MESSAGES['error_invalid_number'])
     end
@@ -248,8 +259,8 @@ loop do
   loop do
     down_payment = get_down_payment
     break if /^.+\%$/.match?(down_payment)
-    remove_punct(down_payment)
-    if down_payment.to_i < 1000
+    remove_symbols(down_payment)
+    if down_payment.to_i < 1000 || down_payment.to_i != 0
       checked_down_payment = check_down_payment(down_payment)
       if checked_down_payment == 'y'
         prompt(MESSAGES['down_payment_check'])
@@ -262,7 +273,7 @@ loop do
     end
   end
 
-  down_payment_formatted = format_down_payment(down_payment, purchase_price)
+  down_payment_formatted = convert_down_payment(down_payment, purchase_price)
   loan_amount = calc_loan_amount(purchase_price, down_payment_formatted)
   apr = get_apr
   term_months = get_term
