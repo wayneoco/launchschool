@@ -22,38 +22,41 @@ def valid_price?(input)
     !input.match?(/^\$?[0]\.?\d*?$/)
 end
 
-def valid_down_payment?(input)
-  # Checks for valid down payment expressed either as a dollar amount
-  #   or a percentage of the purchase price.
-  input.match?(
-    %r{
-      (
-        (^\$?\d+(\.\d{2})?$)|
-        (^\$?\d{1,3}(\.?\d{2})?$)|
-        (^\$?\d{1,3}(\,\d{3})*(\.\d{2})?$)
-      )
-    }x
+def valid_down_payment?(down_payment, purchase_price)
+  (down_payment.match?(
+    %r{((^\$?\d+(\.\d{2})?$)|
+        (^\$?\d{1,3}(\.\d{2})?$)|
+        (^\$?\d{1,3}(\,\d{3})*(\.\d{2})?$))}x
   ) &&
-    !input.match?(/^\$?(00)\.?\d+$/) ||
-    input.match?(/^\d{1,2}(\.\d{1,2})?\%?$/)
+    remove_symbols(down_payment).to_f < purchase_price &&
+    !down_payment.match?(/^\$?(00)\.?\d+$/)) ||
+    down_payment.match?(/^\d{1,2}(\.\d{1,2})?\%?$/)
+end
+
+def percentage_down_payment?(down_payment)
+  down_payment.match?(/^\d{1,2}(\.\d{1,2})?\%?$/)
 end
 
 def valid_apr?(input)
-  input.match?(/^\d{1,2}(\.\d{1,3})?\%?$/)
+  input.match?(/^\d{1,2}(\.\d{1,3})?\%?$/) &&
+    input != '0'
 end
 
 def valid_term?(input)
-  input.match?(/^\d{1,2}\.?\d+?$/)
+  input.match?(/^\d{1,2}$/)
 end
 
 def remove_symbols(num)
-  # Removes '$' and ',' if present, so that the string
-  #   can be converted to a float.
   num.each_char do |x|
     if x == '$' || x == ','
       num.delete!(x)
     end
   end
+end
+
+def yes_or_no(response)
+  return 'y' if response == 'y' || response == 'yes'
+  return 'n' if response == 'n' || response == 'no'
 end
 
 def get_purchase_price
@@ -68,11 +71,11 @@ def get_purchase_price
   end
 end
 
-def get_down_payment
+def get_down_payment(purchase_price)
   loop do
     prompt(MESSAGES['down_payment_amount?'])
     down_payment = gets.chomp
-    if valid_down_payment?(down_payment)
+    if valid_down_payment?(down_payment, purchase_price)
       return down_payment
     else
       prompt(MESSAGES['error_invalid_number'])
@@ -80,40 +83,35 @@ def get_down_payment
   end
 end
 
-def check_down_payment(down_payment)
-  # This gets triggered if the down payment entered is under $1,000 but not $0.
-  #   Down payments are rarely sub-four figures (but can often be $0), so this
-  #   method asks the user to confirm if a sub-four figure down payment is entered.
+def check_low_down_payment(down_payment)
   loop do
-    puts <<~MSG
-      => Hmmm. That looks unusually low.
-      => Are you sure you meant to enter $#{down_payment}?
-      MSG
-    response = gets.chomp
-    if response == 'yes' || response == 'y'
-      return 'y'
-    elsif response == 'no' || response == 'n'
-      return 'n'
-    else
+    return 'y' unless down_payment.to_f < 1000 && down_payment.to_f != 0
+    prompt(MESSAGES['down_payment_low'])
+    prompt("You entered $#{down_payment}. Is that correct? (y/n)")
+    loop do
+      response = gets.chomp.downcase
+      return 'y' if yes_or_no(response) == 'y'
+      return 'n' if yes_or_no(response) == 'n'
       prompt(MESSAGES['error_invalid_choice'])
     end
   end
 end
 
-def convert_down_payment(down_payment, purchase_price)
-  # Because this program allows the user to enter the down payment as either
-  #   a dollar amount or a percentage, this method converts the
-  #   down payment to a dollar amount if entered as a percentage, or leaves it
-  #   as is if entered as a dollar amount.
-  if (/^\d{1,2}(\.\d{1,2})?\%?$/).match?(down_payment)
-    (down_payment.delete!('%').to_f / 100) * purchase_price
-  else
-    remove_symbols(down_payment).to_f
+def retrieve_down_payment(purchase_price)
+  loop do
+    down_payment = get_down_payment(purchase_price)
+    return if /^.+\%$/.match?(down_payment)
+    remove_symbols(down_payment)
+    return if check_low_down_payment(down_payment) == 'y'
   end
 end
 
-def calc_loan_amount(purchase_price, down_payment_formatted)
-  purchase_price - down_payment_formatted
+def convert_down_payment(down_payment, purchase_price)
+  (down_payment.delete!('%').to_f / 100) * purchase_price
+end
+
+def calc_loan_amount(purchase_price, down_payment)
+  purchase_price - down_payment.to_f
 end
 
 def get_apr
@@ -167,14 +165,10 @@ end
 def get_hoa
   loop do
     prompt(MESSAGES['hoa?'])
-    hoa = gets.chomp.downcase
-    if hoa == 'yes' || hoa == 'y'
-      return 'y'
-    elsif hoa == 'no' || hoa == 'n'
-      return 'n'
-    else
-      prompt(MESSAGES['error_invalid_choice'])
-    end
+    response = gets.chomp.downcase
+    return 'y' if yes_or_no(response) == 'y'
+    return 'n' if yes_or_no(response) == 'n'
+    prompt(MESSAGES['error_invalid_choice'])
   end
 end
 
@@ -233,11 +227,12 @@ end
 def use_again
   loop do
     prompt(MESSAGES['use_again?'])
-    response = gets.chomp
-    if response == 'yes' || response == 'y'
-      return 'y'
-    elsif response == 'no' || response == 'n'
-      return 'n'
+    response = gets.chomp.downcase
+    if yes_or_no(response) == 'y'
+      break
+    elsif yes_or_no(response) == 'n'
+      prompt(MESSAGES['goodbye'])
+      exit!
     else
       prompt(MESSAGES['error_invalid_choice'])
     end
@@ -253,28 +248,13 @@ loop do
   prompt(MESSAGES['welcome_02'])
 
   purchase_price = get_purchase_price
+  down_payment = retrieve_down_payment(purchase_price)
 
-  down_payment = ''
-
-  loop do
-    down_payment = get_down_payment
-    break if /^.+\%$/.match?(down_payment)
-    remove_symbols(down_payment)
-    if down_payment.to_i < 1000 && down_payment.to_i != 0
-      checked_down_payment = check_down_payment(down_payment)
-      if checked_down_payment == 'y'
-        prompt(MESSAGES['down_payment_check'])
-        break
-      elsif checked_down_payment == 'n'
-        prompt(MESSAGES['down_payment_again'])
-      end
-    else
-      break
-    end
+  if (/^\.+\%$/).match?(down_payment)
+    down_payment = convert_down_payment(down_payment, purchase_price)
   end
 
-  down_payment_formatted = convert_down_payment(down_payment, purchase_price)
-  loan_amount = calc_loan_amount(purchase_price, down_payment_formatted)
+  loan_amount = calc_loan_amount(purchase_price, down_payment)
   apr = get_apr
   term_months = get_term
 
@@ -288,9 +268,8 @@ loop do
 
   property_taxes = get_property_taxes
   insurance = get_insurance
-  hoa = get_hoa
 
-  if hoa == 'y'
+  if get_hoa() == 'y'
     hoa_dues = get_hoa_dues
     hoa_frequency = get_hoa_frequency
     hoa_monthly = calc_hoa_monthly(hoa_frequency, hoa_dues)
@@ -304,12 +283,7 @@ loop do
 
   display_monthly_total(total_monthly)
 
-  start_over = use_again
+  use_again
 
-  if start_over == 'y'
-    next
-  else
-    prompt(MESSAGES['goodbye'])
-    exit!
-  end
+  clear
 end

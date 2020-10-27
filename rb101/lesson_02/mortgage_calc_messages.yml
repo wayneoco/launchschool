@@ -1,13 +1,14 @@
 welcome_01: 'Welcome to Mortgage Calculator'
 welcome_02: "Let's calculate your monthly principal and interest."
-error_invalid_choice: "Whoops! Sorry, but that's not a valid choice."
+error_invalid_choice: "Whoops! Sorry, but that's not a valid choice. Please try again."
 error_invalid_number: "Sorry, but that's not a valid number."
 error_invalid_apr: "Sorry, but that's not a valid APR."
 purchase_amount?: "What's the purchase price of the home?"
 down_payment_amount?: >-
   How much will you be putting down as a down payment?
   You can enter either a specific dollar amount or a percentage.
-down_payment_check: 'Okay, I just wanted to make sure. Thank you.'
+down_payment_low: 'Hmmm. That down payment looks unusually low.'
+down_payment_okay: 'Okay, I just wanted to make sure. Thank you.'
 down_payment_again: "No worries. Let's try this again."
 apr: "What's the Annual Percentage Rate (APR) of your loan?"
 term: 'Over how many years will you be paying back this loan?'
