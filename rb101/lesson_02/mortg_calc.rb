@@ -207,12 +207,12 @@ def calc_hoa_monthly(hoa_frequency, hoa_dues)
   end
 end
 
-def calc_monthly_p_and_i(loan_amount, apr, term_months)
+def calc_monthly_principal_and_interest(loan_amount, apr, term_months)
   rate_monthly = apr / 12
   loan_amount * (rate_monthly / (1 - (1 + rate_monthly)**(-term_months)))
 end
 
-def display_p_and_i(p_and_i)
+def display_principal_and_interest(p_and_i)
   prompt("Your monthly principal and interest payment is $#{p_and_i.round(2)}.")
 end
 
@@ -258,9 +258,9 @@ loop do
   apr = get_apr
   term_months = get_term
 
-  p_and_i = calc_monthly_p_and_i(loan_amount, apr, term_months)
+  p_and_i = calc_monthly_principal_and_interest(loan_amount, apr, term_months)
 
-  display_p_and_i(p_and_i)
+  display_principal_and_interest(p_and_i)
 
   sleep(1)
 
