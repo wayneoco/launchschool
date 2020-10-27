@@ -1,7 +1,7 @@
 welcome_01: 'Welcome to Mortgage Calculator'
 welcome_02: "Let's calculate your monthly principal and interest."
 error_invalid_choice: "Whoops! Sorry, but that's not a valid choice. Please try again."
-error_invalid_number: "Sorry, but that's not a valid number."
+error_invalid_number: "Sorry, but that's not a valid input."
 error_invalid_apr: "Sorry, but that's not a valid APR."
 purchase_amount?: "What's the purchase price of the home?"
 down_payment_amount?: >-
