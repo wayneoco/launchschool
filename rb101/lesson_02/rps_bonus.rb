@@ -26,9 +26,16 @@ def expand_abbr_choice(choice)
   end
 end
 
-def valid_choice?(choice)
-  VALID_CHOICES.include?(choice) ||
-    %w(r p l sc sp).include?(choice)
+def valid_choice?(response)
+  loop do
+    response = gets.chomp.downcase
+    if VALID_CHOICES.include?(response)
+      return expand_abbr_choice(response) if %w(r p l sc sp).include?(response)
+      return response
+    else
+      prompt("That's not a valid choice.")
+    end
+  end
 end
 
 def display_getting_close(player_win_count, computer_win_count)
@@ -39,6 +46,11 @@ def display_getting_close(player_win_count, computer_win_count)
       "Computer has 4 wins and could soon be the grand winner. Hang in there!"
     )
   end
+end
+
+def player_choice(response)
+  prompt("Choose one: #{USER_CHOICES.join(', ')}")
+  valid_choice?(response)
 end
 
 win_rules = {
@@ -72,16 +84,17 @@ def display_score(player_win_count, computer_win_count)
 end
 
 def display_final_score(player_win_count, computer_win_count)
-  prompt("Final Score:\n=> You: #{player_win_count}, Computer: #{computer_win_count}")
+  prompt(
+    "Final Score:\n=> You: #{player_win_count}, Computer: #{computer_win_count}"
+  )
 end
 
 def display_grand_winner(player_win_count, computer_win_count)
-  prompt(
-    "You're the first to reach 5 wins. You're the grand winner!"
-  ) if player_win_count == 5
-  prompt(
-    "Computer reached 5 wins first. Computer is the grand winner!"
-  ) if computer_win_count == 5
+  if player_win_count == 5
+    prompt("You're the first to reach 5 wins. You're the grand winner!")
+  elsif computer_win_count == 5
+    prompt("Computer reached 5 wins first. Computer is the grand winner!")
+  end
 end
 
 def play_again
@@ -96,7 +109,7 @@ end
 loop do
   clear
 
-  choice = ''
+  response = ''
   match_count = 0
   player_win_count = 0
   computer_win_count = 0
@@ -111,16 +124,7 @@ loop do
 
     display_getting_close(player_win_count, computer_win_count)
 
-    prompt("Choose one: #{USER_CHOICES.join(', ')}")
-    loop do
-      choice = gets.chomp.downcase
-      if valid_choice?(choice)
-        choice = expand_abbr_choice(choice) if %w(r p l sc sp).include?(choice)
-        break
-      else
-        prompt("That's not a valid choice.")
-      end
-    end
+    choice = player_choice(response)
 
     computer_choice = %w(rock paper scissors lizard spock).sample
 
