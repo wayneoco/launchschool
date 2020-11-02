@@ -1,0 +1,19 @@
+welcome: |
+  Welcome to Rock, Paper, Scissors...with a twist!
+  => In this version of Rock, Paper, Scissors, we add two additional moves: Lizard and Spock.
+  => There will be a total of 5 rounds.
+  => The first player to win 5 rounds will be declared the grand winner!
+  => Ready to play? ('yes' to play or 'exit' to leave)
+abort: 'Maybe another time. Good-bye!'
+lets_play: "Great. Let's play!"
+invalid_response: 'That is not a valid response. Please try again.'
+player_4_wins: 'You have 4 wins. One more win and you could be the grand winner!'
+computer_4_wins: 'Computer has 4 wins and could soon be the grand winner. Hang in there!'
+tied_4_wins: 'Tie score! The next round could determine the grand winner.'
+player_won: 'You won!'
+player_lost: 'You lost!'
+tie: "It's a tie!"
+player_grand_winner: "You're the first to reach 5 wins. You're the grand winner!"
+computer_grand_winner: 'Computer reached 5 wins first. Computer is the grand winner. Better luck next time!'
+play_again: 'Would you like to play again?'
+goodbye: 'Thanks for playing! Good-bye!'
