@@ -45,6 +45,8 @@ def display_getting_close(player_win_count, computer_win_count)
     prompt(
       "Computer has 4 wins and could soon be the grand winner. Hang in there!"
     )
+  elsif player_win_count == 4 && computer_win_count == 4
+    prompt("Tie score! The next round could determine the grand winner.")
   end
 end
 
