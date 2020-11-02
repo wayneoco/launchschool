@@ -31,43 +31,57 @@ def valid_choice?(choice)
     %w(r p l sc sp).include?(choice)
 end
 
-def display_getting_close(player_wins, computer_wins)
-  if player_wins == 4
-    prompt("You have 4 wins- one more and you could be the winner!")
-  elsif computer_wins == 4
-    prompt("Computer has 4 wins and could soon be the winner. Hang in there!")
+def display_getting_close(player_win_count, computer_win_count)
+  if player_win_count == 4
+    prompt("You have 4 wins- one more and you could be the grand winner!")
+  elsif computer_win_count == 4
+    prompt(
+      "Computer has 4 wins and could soon be the grand winner. Hang in there!"
+    )
   end
 end
 
-def win?(first, second)
-  (first == 'rock' && second == 'scissors') ||
-    (first == 'rock' && second == 'lizard') ||
-    (first == 'paper' && second == 'rock') ||
-    (first == 'paper' && second == 'spock') ||
-    (first == 'scissors' && second == 'paper') ||
-    (first == 'scissors' && second == 'lizard') ||
-    (first == 'lizard' && second == 'paper') ||
-    (first == 'lizard' && second == 'spock') ||
-    (first == 'spock' && second == 'rock') ||
-    (first == 'spock' && second == 'scissors')
+win_rules = {
+  'rock' => ['scissors', 'lizard'],
+  'paper' => ['rock', 'spock'],
+  'scissors' => ['paper', 'lizard'],
+  'lizard' => ['paper', 'spock'],
+  'spock' => ['rock', 'scissors']
+}
+
+def who_wins(win_rules, choice, computer_choice)
+  if win_rules.fetch(choice).include?(computer_choice)
+    'player'
+  elsif win_rules.fetch(computer_choice).include?(choice)
+    'computer'
+  end
 end
 
-def display_results(player, computer)
-  if win?(player, computer)
+def display_results(win_rules, choice, computer_choice)
+  if who_wins(win_rules, choice, computer_choice) == 'player'
     prompt("You won!")
-  elsif win?(computer, player)
+  elsif who_wins(win_rules, choice, computer_choice) == 'computer'
     prompt("You lose!")
   else
     prompt("It's a tie!")
   end
 end
 
-def display_score(player_wins, computer_wins)
-  prompt("Score: You: #{player_wins}, Computer: #{computer_wins}")
+def display_score(player_win_count, computer_win_count)
+  prompt("Score: You: #{player_win_count}, Computer: #{computer_win_count}")
 end
 
-def display_final_score(player_wins, computer_wins)
-  prompt("Final Score:\n=> You: #{player_wins}, Computer: #{computer_wins}")
+def display_final_score(player_win_count, computer_win_count)
+  prompt("Final Score:\n=> You: #{player_win_count}, Computer: #{computer_win_count}")
+end
+
+def display_grand_winner(player_win_count, computer_win_count)
+  prompt(
+    "You're the first to reach 5 wins. You're the grand winner!"
+  ) if player_win_count == 5
+  prompt(
+    "Computer reached 5 wins first. Computer is the grand winner!"
+  ) if computer_win_count == 5
 end
 
 def play_again
@@ -79,26 +93,23 @@ def play_again
   end
 end
 
-choice = ''
-player_wins = 0
-computer_wins = 0
-
 loop do
-
-  match_count = 0
-
   clear
 
+  choice = ''
+  match_count = 0
+  player_win_count = 0
+  computer_win_count = 0
+
   prompt("Welcome to Rock, Paper, Scissors!")
-  prompt("First player to win 5 matches will be declared the winner!")
+  prompt("First player to win 5 matches will be declared the grand winner.")
 
   loop do
-
     prompt("Match # #{match_count += 1}")
 
-    display_score(player_wins, computer_wins) if match_count > 1
+    display_score(player_win_count, computer_win_count) if match_count > 1
 
-    display_getting_close(player_wins, computer_wins)
+    display_getting_close(player_win_count, computer_win_count)
 
     prompt("Choose one: #{USER_CHOICES.join(', ')}")
     loop do
@@ -115,28 +126,30 @@ loop do
 
     puts("You chose: #{choice}; Computer chose: #{computer_choice}")
 
-    display_results(choice, computer_choice)
+    display_results(win_rules, choice, computer_choice)
 
-    player_wins += 1 if win?(choice, computer_choice)
-    computer_wins += 1 if win?(computer_choice, choice)
+    player_win_count += 1 if who_wins(
+      win_rules, choice, computer_choice
+    ) == 'player'
+    computer_win_count += 1 if who_wins(
+      win_rules, choice, computer_choice
+    ) == 'computer'
 
-    break if player_wins == 5
-    break if computer_wins == 5
+    break if player_win_count == 5
+    break if computer_win_count == 5
 
-    display_score(player_wins, computer_wins)
+    display_score(player_win_count, computer_win_count)
 
     sleep(4)
 
     clear
-
   end
 
-  display_final_score(player_wins, computer_wins)
+  display_final_score(player_win_count, computer_win_count)
 
   sleep(1)
 
-  prompt("You're the first to reach 5 wins. You win!") if player_wins == 5
-  prompt("Computer reached 5 wins first. You lose!") if computer_wins == 5
+  display_grand_winner(player_win_count, computer_win_count)
 
   repeat = play_again
 
