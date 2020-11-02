@@ -30,17 +30,17 @@ end
 
 def get_choice
   prompt("Choose one: #{USER_CHOICES.join(', ')}")
-  choice = gets.chomp.downcase
+  gets.chomp.downcase
 end
 
-def valid_choice?(response)
+def valid_choice?(choice)
   loop do
-    if VALID_CHOICES.include?(response)
-      return expand_abbr_choice(response) if %w(r p l sc sp).include?(response)
-      response
+    if VALID_CHOICES.include?(choice)
+      return expand_abbr_choice(choice) if %w(r p l sc sp).include?(choice)
+      return choice
     else
       prompt(MESSAGES['invalid_response'])
-      response = gets.chomp.downcase
+      choice = gets.chomp.downcase
     end
   end
 end
@@ -70,10 +70,9 @@ def display_getting_close(player_win_count, computer_win_count)
   end
 end
 
-def display_moves(choice, computer_choice)
-  puts(
-    "You chose: #{choice.upcase}. Computer chose: #{computer_choice.upcase}"
-  )
+def display_moves(player_choice, computer_choice)
+  puts "You chose: #{player_choice.upcase}. \
+  Computer chose: #{computer_choice.upcase}"
 end
 
 win_rules = {
@@ -84,21 +83,21 @@ win_rules = {
   'spock' => ['rock', 'scissors']
 }
 
-def who_wins(win_rules, choice, computer_choice)
-  if win_rules.fetch(choice).include?(computer_choice)
+def who_wins(win_rules, player_choice, computer_choice)
+  if win_rules.fetch(player_choice).include?(computer_choice)
     'player'
-  elsif win_rules.fetch(computer_choice).include?(choice)
+  elsif win_rules.fetch(computer_choice).include?(player_choice)
     'computer'
   end
 end
 
-def display_results(win_rules, choice, computer_choice)
-  if who_wins(win_rules, choice, computer_choice) == 'player'
-    prompt("#{choice.upcase} beats #{computer_choice.upcase}")
+def display_results(win_rules, player_choice, computer_choice)
+  if who_wins(win_rules, player_choice, computer_choice) == 'player'
+    prompt("#{player_choice.upcase} beats #{computer_choice.upcase}")
     sleep(1)
     prompt(MESSAGES['player_won'])
-  elsif who_wins(win_rules, choice, computer_choice) == 'computer'
-    prompt("#{computer_choice.upcase} beats #{choice.upcase}")
+  elsif who_wins(win_rules, player_choice, computer_choice) == 'computer'
+    prompt("#{computer_choice.upcase} beats #{player_choice.upcase}")
     sleep(1)
     prompt(MESSAGES['player_lost'])
   else
@@ -160,19 +159,19 @@ loop do
 
     sleep(1)
 
-    choice = valid_choice?(get_choice)
+    player_choice = valid_choice?(get_choice)
 
     computer_choice = %w(rock paper scissors lizard spock).sample
 
-    display_moves(choice, computer_choice)
+    display_moves(player_choice, computer_choice)
 
-    display_results(win_rules, choice, computer_choice)
+    display_results(win_rules, player_choice, computer_choice)
 
     player_win_count += 1 if who_wins(
-      win_rules, choice, computer_choice
+      win_rules, player_choice, computer_choice
     ) == 'player'
     computer_win_count += 1 if who_wins(
-      win_rules, choice, computer_choice
+      win_rules, player_choice, computer_choice
     ) == 'computer'
 
     break if player_win_count == 5
