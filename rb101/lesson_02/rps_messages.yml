@@ -3,7 +3,7 @@ welcome: |
   => In this version of Rock, Paper, Scissors, we add two additional moves: Lizard and Spock.
   => There will be a total of 5 rounds.
   => The first player to win 5 rounds will be declared the grand winner!
-  => Ready to play? ('yes' to play or 'exit' to leave)
+ready_to_play: "Ready to play? ('yes' to play or 'exit' to leave)"
 abort: 'Maybe another time. Good-bye!'
 lets_play: "Great. Let's play!"
 invalid_response: 'That is not a valid response. Please try again.'
