@@ -3,8 +3,22 @@ MESSAGES = YAML.load_file('rps_messages.yml')
 
 USER_CHOICES =
   ['rock (r)', 'paper (p)', 'scissors (sc)', 'lizard (l)', 'spock (sp)']
-VALID_CHOICES =
-  %w(rock r paper p scissors sc lizard l spock sp)
+VALID_CHOICES = %w(rock r paper p scissors sc lizard l spock sp)
+ABBR_CHOICES = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'sc' => 'scissors',
+  'l' => 'lizard',
+  'sp' => 'spock'
+}
+WIN_RULES = {
+  'rock' => ['scissors', 'lizard'],
+  'paper' => ['rock', 'spock'],
+  'scissors' => ['paper', 'lizard'],
+  'lizard' => ['paper', 'spock'],
+  'spock' => ['rock', 'scissors']
+}
+GOAL_WINS = 5
 
 def clear
   system('clear') || system('cls')
@@ -14,113 +28,150 @@ def prompt(message)
   puts "=> #{message}"
 end
 
+def display_welcome
+  clear
+  prompt(MESSAGES['welcome'])
+end
+
 def ready_to_play
   answer = ''
   loop do
+    prompt(MESSAGES['ready_to_play'])
     answer = gets.chomp.downcase
     break if %w(yes y exit e).include?(answer)
     prompt(MESSAGES['invalid_response'])
   end
-  prompt(MESSAGES['lets_play']) if %w(yes y).include?(answer)
-  if %w(exit e).include?(answer)
-    prompt(MESSAGES['abort'])
-    exit!
-  end
+  lets_play if %w(yes y).include?(answer)
+  abort if %w(exit e).include?(answer)
+end
+
+def lets_play
+  prompt(MESSAGES['lets_play'])
+  sleep(2)
+  clear
+end
+
+def abort
+  prompt(MESSAGES['abort'])
+  exit!
+end
+
+def display_round_count(round_count)
+  clear
+  prompt("Round # #{round_count}")
 end
 
 def get_choice
-  prompt("Choose one: #{USER_CHOICES.join(', ')}")
-  gets.chomp.downcase
-end
-
-def valid_choice?(choice)
   loop do
-    if VALID_CHOICES.include?(choice)
-      return expand_abbr_choice(choice) if %w(r p l sc sp).include?(choice)
+    prompt("Choose one: #{USER_CHOICES.join(', ')}")
+    choice = gets.chomp.downcase
+    if valid_choice?(choice)
+      if %w(r p l sc sp).include?(choice)
+        return convert_abbr_choice(choice)
+      end
       return choice
     else
       prompt(MESSAGES['invalid_response'])
-      choice = gets.chomp.downcase
     end
   end
 end
 
-def expand_abbr_choice(choice)
-  case choice
-  when 'r'
-    'rock'
-  when 'p'
-    'paper'
-  when 'l'
-    'lizard'
-  when 'sc'
-    'scissors'
-  when 'sp'
-    'spock'
+def valid_choice?(choice)
+  VALID_CHOICES.include?(choice)
+end
+
+def convert_abbr_choice(choice)
+  ABBR_CHOICES.fetch(choice)
+end
+
+def random_move
+  %w(rock paper scissors lizard spock).sample
+end
+
+def display_getting_close(score)
+  sleep(1)
+  player_almost_winner(score)
+  computer_almost_winner(score)
+  tie_almost_winner(score)
+  sleep(1)
+end
+
+def player_almost_winner(score)
+  if score.fetch(:player) == 4 && score.fetch(:computer) != 4
+    prompt(MESSAGES['player_4_wins'])
   end
 end
 
-def display_getting_close(player_win_count, computer_win_count)
-  if player_win_count == 4
-    prompt(MESSAGES['player_4_wins'])
-  elsif computer_win_count == 4
+def computer_almost_winner(score)
+  if score.fetch(:computer) == 4 && score.fetch(:player) != 4
     prompt(MESSAGES['computer_4_wins'])
-  elsif player_win_count == 4 && computer_win_count == 4
+  end
+end
+
+def tie_almost_winner(score)
+  if score.fetch(:player) == 4 && score.fetch(:computer) == 4
     prompt(MESSAGES['tied_4_wins'])
   end
 end
 
 def display_moves(player_choice, computer_choice)
-  puts "You chose: #{player_choice.upcase}. \
-  Computer chose: #{computer_choice.upcase}"
+  prompt("You chose: #{player_choice.upcase}. \
+    Computer chose: #{computer_choice.upcase}")
 end
 
-win_rules = {
-  'rock' => ['scissors', 'lizard'],
-  'paper' => ['rock', 'spock'],
-  'scissors' => ['paper', 'lizard'],
-  'lizard' => ['paper', 'spock'],
-  'spock' => ['rock', 'scissors']
-}
-
-def who_wins(win_rules, player_choice, computer_choice)
-  if win_rules.fetch(player_choice).include?(computer_choice)
+def who_wins(player_choice, computer_choice)
+  if WIN_RULES.fetch(player_choice).include?(computer_choice)
     'player'
-  elsif win_rules.fetch(computer_choice).include?(player_choice)
+  elsif WIN_RULES.fetch(computer_choice).include?(player_choice)
     'computer'
   end
 end
 
-def display_results(win_rules, player_choice, computer_choice)
-  if who_wins(win_rules, player_choice, computer_choice) == 'player'
+def display_results(player_choice, computer_choice)
+  if who_wins(player_choice, computer_choice) == 'player'
     prompt("#{player_choice.upcase} beats #{computer_choice.upcase}")
     sleep(1)
     prompt(MESSAGES['player_won'])
-  elsif who_wins(win_rules, player_choice, computer_choice) == 'computer'
+  elsif who_wins(player_choice, computer_choice) == 'computer'
     prompt("#{computer_choice.upcase} beats #{player_choice.upcase}")
     sleep(1)
     prompt(MESSAGES['player_lost'])
   else
     prompt(MESSAGES['tie'])
   end
+  sleep(3)
 end
 
-def display_score(player_win_count, computer_win_count)
-  prompt("Score: You: #{player_win_count}, Computer: #{computer_win_count}")
+def adjust_score(player_choice, computer_choice, score)
+  if who_wins(player_choice, computer_choice) == 'player'
+    score[:player] += 1
+  elsif who_wins(player_choice, computer_choice) == 'computer'
+    score[:computer] += 1
+  end
 end
 
-def display_final_score(player_win_count, computer_win_count)
+def display_score(score)
+  prompt("Score: You: #{score[:player]}, Computer: #{score[:computer]}")
+end
+
+def goal_wins_reached?(score)
+  score.value?(GOAL_WINS)
+end
+
+def display_final_score(score)
   prompt(
-    "Final Score: You: #{player_win_count}, Computer: #{computer_win_count}"
+    "Final Score: You: #{score[:player]}, Computer: #{score[:computer]}"
   )
+  sleep(1)
 end
 
-def display_grand_winner(player_win_count, computer_win_count)
-  if player_win_count == 5
+def display_grand_winner(score)
+  if score[:player] == GOAL_WINS
     prompt(MESSAGES['player_grand_winner'])
-  elsif computer_win_count == 5
+  elsif score[:computer] == GOAL_WINS
     prompt(MESSAGES['computer_grand_winner'])
   end
+  sleep(1)
 end
 
 def play_again
@@ -133,66 +184,47 @@ def play_again
 end
 
 loop do
-  clear
+  count = 0
+  score = { player: 0, computer: 0 }
+  winner = ''
 
-  round_count = 0
-  player_win_count = 0
-  computer_win_count = 0
-
-  prompt(MESSAGES['welcome'])
+  display_welcome
 
   ready_to_play
 
-  sleep(2)
-
   loop do
-    clear
+    round_count = (count += 1)
 
-    prompt("Match # #{round_count += 1}")
+    display_round_count(round_count)
 
-    display_score(player_win_count, computer_win_count) if round_count > 1
+    display_score(score)
 
-    unless player_win_count < 4 && computer_win_count < 4
-      sleep(1)
-      display_getting_close(player_win_count, computer_win_count)
+    if score.value?(4)
+      display_getting_close(score)
     end
 
-    sleep(1)
+    player_choice = get_choice
 
-    player_choice = valid_choice?(get_choice)
-
-    computer_choice = %w(rock paper scissors lizard spock).sample
+    computer_choice = random_move
 
     display_moves(player_choice, computer_choice)
 
-    display_results(win_rules, player_choice, computer_choice)
+    display_results(player_choice, computer_choice)
 
-    player_win_count += 1 if who_wins(
-      win_rules, player_choice, computer_choice
-    ) == 'player'
-    computer_win_count += 1 if who_wins(
-      win_rules, player_choice, computer_choice
-    ) == 'computer'
+    winner = who_wins(player_choice, computer_choice)
 
-    break if player_win_count == 5
-    break if computer_win_count == 5
+    adjust_score(player_choice, computer_choice, score)
 
-    sleep(3)
+    break if goal_wins_reached?(score)
 
     clear
   end
 
-  display_final_score(player_win_count, computer_win_count)
+  display_final_score(score)
 
-  sleep(1)
+  display_grand_winner(score)
 
-  display_grand_winner(player_win_count, computer_win_count)
-
-  sleep(1)
-
-  repeat = play_again
-
-  break unless ['yes', 'y'].include?(repeat)
+  break unless ['yes', 'y'].include?(play_again)
 end
 
 prompt(MESSAGES['goodbye'])
