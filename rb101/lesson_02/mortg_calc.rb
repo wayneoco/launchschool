@@ -228,13 +228,14 @@ def use_again
   loop do
     prompt(MESSAGES['use_again?'])
     response = gets.chomp.downcase
-    if yes_or_no(response) == 'y'
+    case yes_or_no(response)
+    when 'y'
       break
-    elsif yes_or_no(response) == 'n'
-      prompt(MESSAGES['goodbye'])
+    when 'n'
+      prompt[MESSAGES('goodbye')]
       exit!
     else
-      prompt(MESSAGES['error_invalid_choice'])
+      prompt[MESSAGES('error_invalid_choice')]
     end
   end
 end
