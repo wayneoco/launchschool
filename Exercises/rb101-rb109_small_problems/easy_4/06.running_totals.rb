@@ -26,9 +26,10 @@ puts ''
 
 def running_total_alt2(array)
   new_array = []
-  array.reduce do |num, a|
-    sum = num + a
-    puts sum
+  array.reduce do |memo, num|
+    memo + num
+    new_value = memo + num
+    new_array << new_value
   end
   new_array
 end
@@ -39,3 +40,7 @@ puts running_total_alt2([14, 11, 7, 15, 20]) == [14, 25, 32, 47, 67]
 puts running_total_alt2([3]) == [3]
 puts running_total_alt2([]) == []
 puts ''
+puts running_total_alt2([2, 5, 13])
+puts running_total_alt2([14, 11, 7, 15, 20])
+puts running_total_alt2([3])
+puts running_total_alt2([])
