@@ -1,0 +1,8 @@
+welcome: "Welcome to Mortgage Calculator!"
+purchase_price: "What is the purchase price of the home you're buying? (numbers only)"
+down_payment: "What is your down payment (as a dollar amount, not a percentage)? (numbers only)"
+apr: "What is the interest rate of your mortgage?"
+loan_term: "For how many years is your loan?"
+valid_price: "I'm sorry, but that's not a valid dollar amount. Please enter a value using numbers only."
+valid_apr: "I'm sorry, but that's not a valid interest rate. Please enter a value using numbers and decimals only."
+valid_loan_term: "I'm sorry, but that's not a valid loan term. Please enter a value using numbers only."
