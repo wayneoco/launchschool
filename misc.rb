@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
-WIN_RULES.freeze = {
+WIN_RULES = {
   'rock' => %w[scissors lizard],
   'paper' => %w[rock spock],
   'scissors' => %w[paper lizard],
   'spock' => %w[scissors rock],
   'lizard' => %w[spock paper]
-}
-VALID_CHOICES.freeze = WIN_RULES.keys
-VALID_ABBR_CHOICES.freeze = %w[r p s l]
+}.freeze
+VALID_CHOICES = WIN_RULES.keys
+EXPANDED_CHOICES = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'l' => 'lizard'
+}.freeze
 
 def prompt(message)
   puts "=> #{message}"
@@ -17,20 +21,14 @@ end
 def player_chooses
   prompt("Choose one: #{VALID_CHOICES.join(', ')}")
   input = gets.chomp
-  expand_choice(input) if VALID_ABBR_CHOICES.include?(input)
+  expand_choice(input) if %w[r p l s].include?(input)
 end
 
 def expand_choice(input)
-  if input == 's'
-    prompt("You chose 's'. Please choose either 'scissors' or 'spock'.")
-    input = gets.chomp
-    return
-  end
-  case input
-  when 'r' then 'rock'
-  when 'p' then 'paper'
-  when 'l' then 'lizard'
-  end
+  return EXPANDED_CHOICES.fetch(input) unless input == 's'
+
+  prompt("You chose 's'. Please choose either 'scissors' or 'spock'.")
+  gets.chomp
 end
 
 def valid_choice?(input)
@@ -64,10 +62,10 @@ end
 
 # Program start
 
-player_win_count = 0
-computer_win_count = 0
-
 loop do
+  player_win_count = 0
+  computer_win_count = 0
+
   prompt('Welcome to Rock, Paper, Scissors, Spock, Lizard!')
   prompt('The first player to win 3 rounds is the grand winner!')
 
