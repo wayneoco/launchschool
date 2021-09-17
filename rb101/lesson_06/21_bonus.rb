@@ -27,7 +27,7 @@ def display_dealer_cards(cards, display = :display_all)
   sleep(1)
 end
 
-def player_hit_or_stay(deck, cards)
+def player_hit_or_stay(deck, cards, total)
   loop do
     answer = nil
     loop do
@@ -42,27 +42,26 @@ def player_hit_or_stay(deck, cards)
     cards << deck.pop
     display_card(cards)
     display_player_cards(cards)
-    break if busted?(cards)
+    total = total(cards)
+    break if busted?(total)
   end
 end
 
-def display_player_results(cards)
+def display_player_results(cards, total)
   prompt "That's a bust. You lose!" if busted?(cards)
   prompt 'You chose to stay.' unless busted?(cards)
   sleep(1)
 end
 
-def dealer_hit_or_stay(deck, cards)
-  display_dealer_cards(cards)
+def dealer_hit_or_stay(deck, cards, total)
   loop do
-    break if total(cards) == 21
-
-    break prompt 'Dealer must stay.' if total(cards) > 17
+    break prompt 'Dealer must stay.' if total > 17
 
     dealer_cards << deck.pop
     display_card(cards)
     display_dealer_cards(cards)
-    break if busted?(cards)
+    total = total(cards)
+    break if busted?(total)
   end
 end
 
@@ -84,8 +83,8 @@ def display_winner(dealer_cards, player_cards)
   end
 end
 
-def busted?(cards)
-  total(cards) > 21
+def busted?(total)
+  total > 21
 end
 
 def player_winner?(cards)
@@ -100,7 +99,6 @@ end
 
 def total(cards)
   values = cards.map { |card| card[1] }
-
   sum = 0
   values.each do |value|
     next sum += 11 if value == 'Ace'
@@ -140,18 +138,26 @@ loop do
 
   player_cards = 2.times { hand << deck.pop }
   dealer_cards = 2.times { hand << deck.pop }
+  player_total = 0
+  dealer_total = 0
 
-  display_player_cards(player_cards)
+  display_player_cards(player_cards, player_total)
 
-  display_dealer_cards(dealer_cards, :display_one)
+  display_dealer_cards(dealer_cards, dealer_total, :display_one)
 
   player_hit_or_stay(deck, player_cards)
 
   display_player_results(player_cards)
 
   unless busted?(player_cards)
-    dealer_hit_or_stay(deck, dealer_cards)
+    dealer_total = total(dealer_cards)
+
+    display_dealer_cards(cards)
+
+    dealer_hit_or_stay(deck, dealer_cards, total)
+
     display_final_score(dealer_cards, player_cards)
+
     display_winner(dealer_cards, player_cards)
   end
 
