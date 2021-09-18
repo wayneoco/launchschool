@@ -12,12 +12,12 @@
 
 require 'pry'
 
-# Likely cheating by the spirit of the law, but not by the letter of the law :)
 def reverse!(arr)
-  arr.sort_by! {|x| x = -arr.index(x)}
+  copy = arr.clone
+  copy.each { |el| arr.unshift(el) }
+  arr.slice!(copy.size, copy.size)
+  arr
 end
-
-
 
 list = [1,2,3,4]
 result = reverse!(list)
