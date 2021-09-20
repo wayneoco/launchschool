@@ -15,7 +15,6 @@ def anagrams(words)
       result[key] = [word]
     end
   end
-  binding.pry
 
   result.each_value do |v|
     puts '-----'
