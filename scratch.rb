@@ -1,53 +1,67 @@
-class Vehicle
-  def self.gas_mileage(gallons, miles)
-    puts "#{miles / gallons} miles per gallon of gas"
-  end
+=begin
 
-  def speed_up(number)
-    @current_speed += number
-    puts "You pushed the gas pedal and accelerated #{number} mph."
-  end
+# Problem
 
-  def brake(number)
-    @current_speed -= number
-    puts "You pushed the brake and decelerated #{number} mph."
-  end
+- Three classes: Pet, Owner, Shelter
+- No inheritance
+- Create Pet object with two arguments, animal and color.
+- Create Owner object with one argument, name.
+- Create Shelter object with no arguments.
+- Shelter class has two methods:
+  - `adopt` that takes two arguments:
+    - owner, pet
+  - `print_adoptions` with no arguments that outputs the following:
+    - {Owner} has adopted:
+      - {animal} named {name}
+      - {animal} named {name}
 
-  def current_speed
-    puts "Your current speed is #{@current_speed}."
-  end
 
-  def shut_down
-    @current_speed = 0
-    puts "Let's park this bad boy!"
-  end
+=end
 
-  def spray_paint
-    puts "Hello. Thank you for visiting the Portland Body Shop."
-    puts "What color would you like to paint your car?"
-    new_color = gets.chomp
+class Pet
+  attr_reader :animal, :name
 
-    self.color = new_color
-    puts "Thank you! Your new car color is #{color}."
-  end
-
-  def to_s
-    puts "Your car is a #{year} #{color} #{model}."
+  def initialize(animal, name)
+    @animal = animal
+    @name = name
   end
 end
 
-class MyCar < Vehicle
-  attr_accessor :color
-  attr_reader :year, :model
+class Owner
+  attr_reader :name, :pets
 
-  def initialize(year, color, model)
-    super
-    @year = year
-    @color = color
-    @model = model
-    @current_speed = 0
+  def initialize(name)
+    @name = name
+    @pets = []
+  end
+
+  def add_pet(pet)
+    @pets << pet
   end
 end
 
-i3 = MyCar.new(2015, 'grey', 'i3')
-puts i3
+class Shelter
+  def initialize
+    @owners = {}
+  end
+
+  def adopt(owner, pet)
+    owner.add_pet(pet)
+    @owners[owner.name] ||= owner
+end
+
+butterscotch = Pet.new('cat', 'Butterscotch')
+pudding      = Pet.new('cat', 'Pudding')
+darwin       = Pet.new('bearded dragon', 'Darwin')
+kennedy      = Pet.new('dog', 'Kennedy')
+sweetie      = Pet.new('parakeet', 'Sweetie Pie')
+molly        = Pet.new('dog', 'Molly')
+chester      = Pet.new('fish', 'Chester')
+
+phanson = Owner.new('P Hanson')
+bholmes = Owner.new('B Holmes')
+
+shelter = Shelter.new
+
+puts "#{butterscotch.name} is a #{butterscotch.animal}."
+puts phanson.name
