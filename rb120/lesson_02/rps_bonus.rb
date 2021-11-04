@@ -1,8 +1,123 @@
+# frozen_string_literal: false
+
+# rubocop:disable Style/Documentation
+
+module ComputerPersonality
+  class Personalities
+    attr_reader :name
+
+    def initialize(name)
+      @name = name
+    end
+  end
+
+  class R2d2 < Personalities
+    def choice
+      %w[rock].sample
+    end
+  end
+
+  class Hal < Personalities
+    def choice
+      %w[scissors scissors scissors scissors scissors rock spock spock spock lizard lizard lizard].sample
+    end
+  end
+
+  class Chappie < Personalities
+    def choice
+      %w[rock paper scissors].sample
+    end
+  end
+
+  class Sonny < Personalities
+    def choice
+      %w[paper paper paper paper paper rock rock scissors scissors spock spock lizard lizard].sample
+    end
+  end
+
+  class Number5 < Personalities
+    def choice
+      %w[paper spock].sample
+    end
+  end
+end
+
+module Move
+  VALUES = %w[rock paper scissors spock lizard].freeze
+
+  class Moves
+    attr_reader :name, :winning_moves
+
+    def initialize(choice)
+      @name = choice
+    end
+
+    def winner?(opponent)
+      winning_moves.include?(opponent.name)
+    end
+
+    def to_s
+      @name
+    end
+  end
+
+  class Rock < Moves
+    def initialize(choice)
+      super
+      @winning_moves = %w[scissors lizard]
+    end
+  end
+
+  class Paper < Moves
+    def initialize(choice)
+      super
+      @winning_moves = %w[rock spock]
+    end
+  end
+
+  class Scissors < Moves
+    def initialize(choice)
+      super
+      @winning_moves = %w[paper lizard]
+    end
+  end
+
+  class Spock < Moves
+    def initialize(choice)
+      super
+      @winning_moves = %w[rock scissors]
+    end
+  end
+
+  class Lizard < Moves
+    def initialize(choice)
+      super
+      @winning_moves = %w[spock paper]
+    end
+  end
+end
+
 class Player
-  attr_accessor :move, :name, :score
+  attr_accessor :move, :name, :score, :history
 
   def initialize
     set_name
+    @score = 0
+    @history = []
+  end
+
+  def set_move(choice)
+    case choice
+    when 'rock'     then Move::Rock.new(choice)
+    when 'paper'    then Move::Paper.new(choice)
+    when 'scissors' then Move::Scissors.new(choice)
+    when 'spock'    then Move::Spock.new(choice)
+    when 'lizard'   then Move::Lizard.new(choice)
+    end
+  end
+
+  def update_history(move)
+    history << move
   end
 end
 
@@ -10,6 +125,7 @@ class Human < Player
   def set_name
     n = nil
     loop do
+      system('clear')
       puts "What's your name?"
       n = gets.chomp
       break unless n.empty?
@@ -28,77 +144,43 @@ class Human < Player
 
       puts 'Sorry, invalid choice.'
     end
-    self.move = Move.new(choice)
+    self.move = set_move(choice)
   end
 end
 
 class Computer < Player
+  attr_accessor :personality
+
+  def initialize
+    super
+    set_personality
+  end
+
   def set_name
-    self.name = %w[R2D2 Hal Chappie Sonny Number_5].sample
+    self.name = %w[R2D2 Hal Chappie Sonny Number5].sample
+  end
+
+  # rubocop:disable Metrics/AbcSize
+  def set_personality
+    case name
+    when 'R2D2'     then self.personality = ComputerPersonality::R2d2.new(name)
+    when 'Hal'      then self.personality = ComputerPersonality::Hal.new(name)
+    when 'Chappie'  then self.personality = ComputerPersonality::Chappie.new(name)
+    when 'Sonny'    then self.personality = ComputerPersonality::Sonny.new(name)
+    when 'Number5'  then self.personality = ComputerPersonality::Number5.new(name)
+    end
   end
 
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    case personality.name
+    when 'R2D2'     then self.move = set_move(personality.choice)
+    when 'Hal'      then self.move = set_move(personality.choice)
+    when 'Chappie'  then self.move = set_move(personality.choice)
+    when 'Sonny'    then self.move = set_move(personality.choice)
+    when 'Number5'  then self.move = set_move(personality.choice)
+    end
   end
-end
-
-class Move
-  VALUES = %w[rock paper scissors spock lizard].freeze
-
-  def initialize(value)
-    @value = value
-  end
-
-  def scissors?
-    @value == 'scissors'
-  end
-
-  def rock?
-    @value == 'rock'
-  end
-
-  def paper?
-    @value == 'paper'
-  end
-
-  def spock?
-    @value == 'spock'
-  end
-
-  def lizard?
-    @value == 'lizard'
-  end
-
-  def >(other_move)
-    rock? && other_move.scissors? ||
-      rock? && other_move.lizard? ||
-      paper? && other_move.rock? ||
-      paper? && other_move.spock? ||
-      scissors? && other_move.paper? ||
-      scissors? && other_move.lizard? ||
-      spock? && other_move.scissors? ||
-      spock? && other_move.rock? ||
-      lizard? && other_move.paper? ||
-      lizard? && other_move.spock?
-
-  end
-
-  def <(other_move)
-    rock? && other_move.paper? ||
-      rock? && other_move.spock? ||
-      paper? && other_move.scissors? ||
-      paper? && other_move.lizard? ||
-      scissors? && other_move.rock? ||
-      scissors? && other_move.spock? ||
-      spock? && other_move.paper? ||
-      spock? && other_move.lizard? ||
-      lizard? && other_move.rock? ||
-      lizard? && other_move.scissors?
-  end
-
-  def to_s
-    @value
-  end
+  # rubocop:enable Metrics/AbcSize
 end
 
 class RPSGame
@@ -110,11 +192,17 @@ class RPSGame
   end
 
   def display_welcome_message
-    puts 'Welcome to Rock, Paper, Scissors, Spock, Lizard!'
+    puts "Welcome to Rock, Paper, Scissors, Spock, Lizard, #{human.name}!"
+    puts 'The first player to reach 5 wins will be the Grand Winner!'
   end
 
   def display_goodbye_message
     puts 'Thanks for playing Rock, Paper, Scissors, Spock, Lizard. Good bye!'
+  end
+
+  def choose_moves
+    human.choose
+    computer.choose
   end
 
   def display_moves
@@ -123,9 +211,9 @@ class RPSGame
   end
 
   def display_winner
-    if human.move > computer.move
+    if human.move.winner?(computer.move)
       puts "#{human.name} won!"
-    elsif human.move < computer.move
+    elsif computer.move.winner?(human.move)
       puts "#{computer.name} won!"
     else
       puts "It's a tie!"
@@ -133,9 +221,9 @@ class RPSGame
   end
 
   def calculate_score
-    if human.move > computer.move
+    if human.move.winner?(computer.move)
       human.score += 1
-    elsif human.move < computer.move
+    elsif computer.move.winner?(human.move)
       computer.score += 1
     end
   end
@@ -144,12 +232,17 @@ class RPSGame
     puts "The score is: #{human.name}: #{human.score}, #{computer.name}: #{computer.score}"
   end
 
-  def calculate_grand_winner
+  def update_history
+    human.update_history(human.move)
+    computer.update_history(computer.move)
+  end
+
+  def determine_grand_winner
     human.score > computer.score ? human.name : computer.name
   end
 
   def display_grand_winner
-    puts "#{calculate_grand_winner} is the grand winner!"
+    puts "#{determine_grand_winner} is the grand winner!"
   end
 
   def play_again?
@@ -167,27 +260,49 @@ class RPSGame
     false
   end
 
+  def game_loop
+    loop do
+      choose_moves
+      display_moves
+      display_winner
+      calculate_score
+      display_score
+      update_history
+      break if human.score == 5 || computer.score == 5
+    end
+  end
+
+  def grand_winner
+    determine_grand_winner
+    display_grand_winner
+  end
+
+  def reset_scores
+    human.score = 0
+    computer.score = 0
+  end
+
+  def reset_history
+    human.history = []
+    computer.history = []
+  end
+
   def play
+    system('clear')
     display_welcome_message
 
     loop do
-      human.score = 0
-      computer.score = 0
-      loop do
-        human.choose
-        computer.choose
-        display_moves
-        display_winner
-        calculate_score
-        display_score
-        break if human.score == 2 || computer.score == 2
-      end
-      calculate_grand_winner
-      display_grand_winner
+      game_loop
+      grand_winner
+      reset_scores
+      reset_history
       break unless play_again?
+
+      system('clear')
     end
     display_goodbye_message
   end
 end
+# rubocop:enable Style/Documentation
 
 RPSGame.new.play
