@@ -116,8 +116,8 @@ class Player
     end
   end
 
-  def update_history(move)
-    history << move
+  def update_history
+    history << move.name
   end
 end
 
@@ -184,11 +184,14 @@ class Computer < Player
 end
 
 class RPSGame
-  attr_accessor :human, :computer
+  attr_accessor :game_count, :history, :human_move, :computer_move, :human_history, :computer_history
+  attr_reader :human, :computer
 
   def initialize
     @human = Human.new
     @computer = Computer.new
+    @game_count = 1
+    @history = []
   end
 
   def display_welcome_message
@@ -197,44 +200,59 @@ class RPSGame
   end
 
   def display_goodbye_message
+    puts '====='
     puts 'Thanks for playing Rock, Paper, Scissors, Spock, Lizard. Good bye!'
+    puts '====='
   end
 
   def choose_moves
-    human.choose
-    computer.choose
+    self.human_move = human.choose
+    self.computer_move = computer.choose
   end
 
   def display_moves
-    puts "#{human.name} chose #{human.move}."
-    puts "#{computer.name} chose #{computer.move}."
+    puts '====='
+    puts "#{human.name} chose #{human_move}."
+    puts "#{computer.name} chose #{computer_move}."
   end
 
   def display_winner
-    if human.move.winner?(computer.move)
-      puts "#{human.name} won!"
-    elsif computer.move.winner?(human.move)
-      puts "#{computer.name} won!"
-    else
-      puts "It's a tie!"
-    end
+    return puts "=> It's a tie!" if human_move.name == computer_move.name
+
+    winner = human.name if human_move.winner?(computer_move)
+    winner = computer.name if computer_move.winner?(human_move)
+    puts "=> #{winner} won!"
   end
 
   def calculate_score
-    if human.move.winner?(computer.move)
-      human.score += 1
-    elsif computer.move.winner?(human.move)
-      computer.score += 1
-    end
+    human.score += 1 if human_move.winner?(computer_move)
+    computer.score += 1 if computer_move.winner?(human_move)
   end
 
   def display_score
+    puts '====='
     puts "The score is: #{human.name}: #{human.score}, #{computer.name}: #{computer.score}"
+    puts '====='
   end
 
-  def update_history
-    human.update_history(human.move)
-    computer.update_history(computer.move)
+  def update_move_history
+    self.human_history = human.update_history
+    self.computer_history = computer.update_history
+  end
+
+  def display_move_history
+    answer = nil
+    loop do
+      puts "Would you like to see each player's move history? (y/n)"
+      answer = gets.chomp.downcase
+      break if %w[y n].include? answer
+
+      puts 'Sorry, must be y or n.'
+    end
+    return if answer.start_with? 'n'
+
+    puts "#{human.name}'s move history: #{human_history.inspect}"
+    puts "#{computer.name}'s move history: #{computer_history.inspect}"
   end
 
   def determine_grand_winner
@@ -242,7 +260,7 @@ class RPSGame
   end
 
   def display_grand_winner
-    puts "#{determine_grand_winner} is the grand winner!"
+    puts "=> #{determine_grand_winner} is the grand winner!"
   end
 
   def play_again?
@@ -254,7 +272,7 @@ class RPSGame
 
       puts 'Sorry, must be y or n.'
     end
-
+    self.game_count += 1
     return true if answer == 'y'
 
     false
@@ -267,8 +285,8 @@ class RPSGame
       display_winner
       calculate_score
       display_score
-      update_history
-      break if human.score == 5 || computer.score == 5
+      update_move_history
+      break if human.score == 3 || computer.score == 3
     end
   end
 
@@ -282,24 +300,17 @@ class RPSGame
     computer.score = 0
   end
 
-  def reset_history
-    human.history = []
-    computer.history = []
-  end
-
   def play
-    system('clear')
     display_welcome_message
-
     loop do
       game_loop
       grand_winner
       reset_scores
-      reset_history
       break unless play_again?
 
       system('clear')
     end
+    display_move_history
     display_goodbye_message
   end
 end
