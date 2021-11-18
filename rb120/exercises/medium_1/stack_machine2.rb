@@ -85,3 +85,4 @@ minilang = Minilang.new(FAHRENHEIT_TO_CENTIGRADE)
 minilang.eval(degrees_f: 100)
 minilang.eval(degrees_f: 32)
 minilang.eval(degrees_f: 0)
+
