@@ -1,13 +1,17 @@
-title = "the flintstones rock"
+class Car
+  WHEELS = 4
 
-title.each_char do |char|
-  puts char.object_id
+  def wheels
+    self.class::WHEELS
+  end
 end
 
-puts "====="
-puts "ROUND 2"
-puts "====="
-
-title.each_char do |char|
-  puts char.object_id
+class Motorcycle < Car
+  WHEELS = 2
 end
+
+civic = Car.new
+puts civic.wheels # => 4
+
+bullet = Motorcycle.new
+puts bullet.wheels # => 2
