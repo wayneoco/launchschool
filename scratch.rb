@@ -1,42 +1,12 @@
-class LawFirm
-  attr_reader :name, :address, :phone, :employees
+# frozen_string_literal: true
 
-  def initialize(name, address, phone)
-    @name = name
-    @address = address
-    @phone = phone
-    @employees = []
-  end
+text = File.read('madlibs.txt')
+adjectives = %w(quick lazy sleepy ugly)
+nouns = %w(fox dog head leg)
+verbs = %w(easily lazily noisily excitedly)
 
-  def <<(input)
-    employees << input
-  end
+until !text.include?("%{adjective}")
+  text.sub!("%{adjective}", adjectives.sample)
 end
 
-class Employee
-  attr_reader :name
-
-  def initialize(name)
-    @name = name
-  end
-end
-
-class Partner < Employee
-  def initialize(name)
-  end
-end
-
-class Associate < Employee; end
-
-class Paralegal < Employee; end
-
-firm = LawFirm.new('The Firm', '123 Main St., Disneyland, USA', '123-456-7890')
-partner = Partner.new('Jane')
-associate = Associate.new('Jim')
-paralegal = Paralegal.new('Joe')
-
-p partner
-
-firm << partner
-firm << associate
-firm << paralegal
+puts text

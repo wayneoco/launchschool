@@ -1,43 +1,12 @@
-module Attackable
-  def attack
-    "attacks!"
-  end
+# frozen_string_literal: true
+
+text = File.read('madlibs.txt')
+adjectives = %w(quick lazy sleepy ugly)
+nouns = %w(fox dog head leg)
+verbs = %w(easily lazily noisily excitedly)
+
+until !text.include?("%{adjective}")
+  text.sub!("%{adjective}", adjectives.sample)
 end
 
-class Characters
-  attr_accessor :name, :characters
-
-  def initialize(name)
-    self.name = name
-    @characters = []
-  end
-
-  def display
-    name
-  end
-
-  protected
-  attr_reader :name
-  attr_writer :name
-end
-
-class Monster < Characters
-  include Attackable
-
-  def initialize(name)
-    super
-  end
-end
-
-class Barbarian < Characters
-  def ==(other)
-    if(super.self == super.self) #
-      super.self == super.self
-    end
-  end
-end
-
-conan = Barbarian.new('barb')
-rob = Monster.new('monst')
-conan.characters << rob
-p conan.display
+p text
