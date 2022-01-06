@@ -1,12 +1,13 @@
-# frozen_string_literal: true
+a = 'hello'
+b = a
+c = 'goodbye'
+d = b
 
-text = File.read('madlibs.txt')
-adjectives = %w(quick lazy sleepy ugly)
-nouns = %w(fox dog head leg)
-verbs = %w(easily lazily noisily excitedly)
+a = a.upcase!
+b += ', world!'
+d = c.upcase
 
-until !text.include?("%{adjective}")
-  text.sub!("%{adjective}", adjectives.sample)
-end
-
-p text
+puts a
+puts b
+puts c
+puts d
