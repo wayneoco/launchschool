@@ -26,24 +26,28 @@
 
 class PerfectNumber
   def self.classify(number)
-    raise StandardError unless number.positive?
-
-    case divisors_sum(number) <=> number
-    when 0  then 'perfect'
-    when 1  then 'abundant'
-    else         'deficient'
-    end
+    valid_input?(number)
+    sum = sum_divisors(number)
+    classify_number(sum, number)
   end
 
   class << self
     private
 
-    def divisors_sum(number)
-      sum = 0
-      1.upto(number - 1) do |num|
-        sum += num if (number % num).zero?
+    def valid_input?(number)
+      raise StandardError unless number.positive?
+    end
+
+    def sum_divisors(number)
+      (1...number).reduce(0) { |sum, n| (number % n).zero? ? sum + n : sum }
+    end
+
+    def classify_number(sum, number)
+      case sum <=> number
+      when -1 then 'deficient'
+      when 0  then 'perfect'
+      when 1  then 'abundant'
       end
-      sum
     end
   end
 end

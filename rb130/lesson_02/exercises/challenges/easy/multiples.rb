@@ -4,7 +4,7 @@ class SumOfMultiples
   end
 
   def to(limit)
-    (1..limit - 1).select do |number|
+    (1...limit).select do |number|
       multiple?(number, @numbers)
     end.sum
   end
