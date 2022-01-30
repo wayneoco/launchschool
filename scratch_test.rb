@@ -4,64 +4,47 @@ MiniTest::Reporters.use!
 
 require_relative 'scratch'
 
-class OctalTest < Minitest::Test
-  def test_octal_1_is_decimal_1
-    assert_equal 1, Octal.new('1').to_decimal
+class CipherTest < Minitest::Test
+  def test_rotate_a_by_0_same_output_as_input
+    assert_equal "a", Cipher.rotate("a", 0)
   end
 
-  def test_octal_10_is_decimal_8
-    assert_equal 8, Octal.new('10').to_decimal
+  def test_rotate_a_by_1
+    assert_equal "b", Cipher.rotate("a", 1)
   end
 
-  def test_octal_17_is_decimal_15
-    assert_equal 15, Octal.new('17').to_decimal
+  def test_rotate_a_by_26_same_output_as_input
+    assert_equal "a", Cipher.rotate("a", 26)
   end
 
-  def test_octal_11_is_decimal_9
-    assert_equal 9, Octal.new('11').to_decimal
+  def test_rotate_m_by_13
+    assert_equal "z", Cipher.rotate("m", 13)
   end
 
-  def test_octal_130_is_decimal_88
-    assert_equal 88, Octal.new('130').to_decimal
+  def test_rotate_n_by_13_with_wrap_around_alphabet
+    assert_equal "a", Cipher.rotate("n", 13)
   end
 
-  def test_octal_2047_is_decimal_1063
-    assert_equal 1063, Octal.new('2047').to_decimal
+  def test_rotate_capital_letters
+    assert_equal "TRL", Cipher.rotate("OMG", 5)
   end
 
-  def test_octal_7777_is_decimal_4095
-    assert_equal 4095, Octal.new('7777').to_decimal
+  def test_rotate_spaces
+    assert_equal "T R L", Cipher.rotate("O M G", 5)
   end
 
-  def test_octal_1234567_is_decimal_342391
-    assert_equal 342_391, Octal.new('1234567').to_decimal
+  def test_rotate_numbers
+    assert_equal "Xiwxmrk 1 2 3 xiwxmrk",
+                 Cipher.rotate("Testing 1 2 3 testing", 4)
   end
 
-  def test_invalid_octal_is_decimal_0
-    assert_equal 0, Octal.new('carrot').to_decimal
+  def test_rotate_punctuation
+    assert_equal "Gzo'n zvo, Bmviyhv!",
+                 Cipher.rotate("Let's eat, Grandma!", 21)
   end
 
-  def test_8_is_seen_as_invalid_and_returns_0
-    assert_equal 0, Octal.new('8').to_decimal
-  end
-
-  def test_9_is_seen_as_invalid_and_returns_0
-    assert_equal 0, Octal.new('9').to_decimal
-  end
-
-  def test_6789_is_seen_as_invalid_and_returns_0
-    assert_equal 0, Octal.new('6789').to_decimal
-  end
-
-  def test_abc1z_is_seen_as_invalid_and_returns_0
-    assert_equal 0, Octal.new('abc1z').to_decimal
-  end
-
-  def test_valid_octal_formatted_string_011_is_decimal_9
-    assert_equal 9, Octal.new('011').to_decimal
-  end
-
-  def test_234abc_is_seen_as_invalid_and_returns_0
-    assert_equal 0, Octal.new('234abc').to_decimal
+  def test_rotate_all_letters
+    assert_equal "Gur dhvpx oebja sbk whzcf bire gur ynml qbt.",
+      Cipher.rotate("The quick brown fox jumps over the lazy dog.", 13)
   end
 end
