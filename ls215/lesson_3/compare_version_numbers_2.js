@@ -1,0 +1,167 @@
+/* eslint-disable */
+
+/* # Problem Description
+ * 1
+ * 1.0
+ * 1.2
+ * 3.2.3
+ * 3.0.0
+ * 4.2.3.0
+
+ * Write a function that takes any two version numbers in this format and compares them, with the result of this comparison showing whether the first is less than, equal to, or greater than the second version:
+ *
+ * If version1 > version2, we should return 1.
+ * If version1 < version2, we should return -1.
+ * If version1 === version2, we should return 0.
+ * If either version number contains characters other than digits and the . character, we should return null.
+ *
+ * Example of number ordering:
+ * 0.1 < 1 = 1.0 < 1.1 < 1.2 = 1.2.0.0 < 1.18.2 < 13.37
+ *
+ * ### Problem ###
+ * input:
+ *  - a string comprised only of one or more digits and 0 or more decimals (all other characters are invalid)
+ *  - the string is comprised of one or more number groups delimited by 0 or more decimals
+ *  - if a number n is not followed by a decimal, that number is equivalent to n.0
+ *  - input strings can have a varying number of number groups, e.g., 1.2 vs. 1.18.2
+ * output:
+ *  - an integer (-1, 0, 1)
+ *  - null if input is not a valid string
+ *
+ * modelling the problem:
+ *  - 0.1 < 1
+ *  - 1 = 1.0
+ *  - 1.0 < 1.1
+ *  - 1.1 < 1.2
+ *  - 1.2 = 1.2.0.0
+ *  - 1.2.0.0 < 1.18.2
+ *  - 1.18.2 < 13.37
+ *
+ * rules:
+ *  - a number group is a group of 1 or more numbers delimited by a decimal
+ *    - e.g.,
+ *      - 1.0 has two number groups
+ *      - 2, which is equivalent to 2.0, has two number groups
+ *      - 1.18.3 has three number groups
+ *  - to compare two version numbers, the number groups of each version number must be compared against each other sequentially
+ *    - if the two number groups are equal, proceed to compare the next number groups
+ *    - if the number groups are not equal, return -1 or 1
+ *    - if all number groups of both version numbers have been compared, and all number groups are equal, return 0.
+ *    - if the amount of number groups is not equal, n number of number groups must be added to the shorter version number
+ *    - e.g.,
+ *      - version1: 1.1
+ *        - has two number groups, 1 and 1
+ *      - version2: 1.2
+ *        - has two number groups, 1 and 2
+ *      - group1: 1 <=> 1 === 0, therefore continue to compare next number groups
+ *      - group2: 1 <=> 2 === -1, therefore return -1
+ *    - e.g.,
+ *      - version1: 1.1
+ *      - version2: 1.1.0.2
+ *      - version1 becomes 1.1.0.0
+ *      - group1: 1 <=> 1 === 0
+ *      - group2: 1 <=> 1 === 0
+ *      - group3: 0 <=> 0 === 0
+ *      - group4: 0 <=> 2 === -1
+ *
+ * ### Examples / Test Cases
+ *
+ * compareVersions('1..', '1.2');             // null
+ * compareVersions('1.1', '.1');              // null
+ * compareVersions('', '1.0');                // null
+ * compareVersions('2..2', '2.1');            // null
+ * compareVersions('1', '1.0.0');             // 0
+*  compareVersions('1.2', '1.3.1);            // -1
+*  compareVersions('3.21.2', '3.21.1');       // 1
+ *
+ * ### Data Structures ###
+ * - input:
+ *   - split into an array of number groups, using a decimal point as delimiter
+ *   - number strings converted to numbers for comparison
+ * - output: 
+ *   - number
+ *
+ * ### Algorithm ###
+ * Approach: create a function that takes two strings as arguments, where the strings represent version numbers. Compare the two strings, returning -1, 0, or 1 depending on whether the first version number is less than, equal to or greater than the second version number, or null if either version number contains invalid characters.
+ * Function:
+ *  - return null if either input string is an invalid version number
+ *    - a valid version number:
+ *      - contains only digits and 0 or more decimals
+ *      - does not begin with a decimal
+ *      - is not an empty string
+ *      - does not contain two or more decimals in a row
+ *  - split each input version number into an array of characters, using a decimal point as a delimiter
+ *  - convert all string elements to numbers
+ *  - if one array is shorter than the other:
+ *    - expand shorter array to the length of the longer array
+ *    - fill empty elements with 0
+ *  - iterate through the first input version:
+ *    - compare each element of the first array with the corresponding element of the second array
+ *    - if an element is less than or greater than the other element, return -1 or 1
+ *    - if the elements are equal, continue to the next element
+ *  - if all elements in both arrays are equal, return 0
+
+/* eslint-enable */
+
+function compareVersions(version1, version2) {
+  if (isInvalidVersionNumber(version1) || isInvalidVersionNumber(version2)) return null;
+
+  let v1Numbers = version1.split('.');
+  let v2Numbers = version2.split('.');
+
+  [ v1Numbers, v2Numbers ] = equalizeArrayLengths(v1Numbers, v2Numbers);
+
+  for (let index = 0; index < v1Numbers.length; index += 1) {
+    const v1Number = Number(v1Numbers[index]);
+    const v2Number = Number(v2Numbers[index]);
+
+    if (v1Number < v2Number) {
+      return -1;
+    } else if (v1Number > v2Number) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+function isInvalidVersionNumber(versionNumber) {
+  const invalidChars = /[^0-9.]/;
+  const startsWithDecimal = /^\./;
+  const endsWithADecimal = /\.$/;
+  const twoDecimalsInARow = /\.\./g;
+
+  return invalidChars.test(versionNumber) ||
+    startsWithDecimal.test(versionNumber) ||
+    endsWithADecimal.test(versionNumber) ||
+    twoDecimalsInARow.test(versionNumber) ||
+    versionNumber.length === 0;
+}
+
+function equalizeArrayLengths(array1, array2) {
+  const array1Length = array1.length;
+  const array2Length = array2.length;
+
+  if (array1Length === array2Length) {
+    return [array1, array2];
+  } else if (array1Length < array2Length) {
+    array1.length = array2Length;
+    array1.fill('0', array1Length);
+  } else {
+    array2.length = array1Length;
+    array2.fill('0', array2Length);
+  }
+
+  return [array1, array2];
+}
+
+console.log(compareVersions('1', '1'));            // 0
+console.log(compareVersions('1.1', '1.0'));        // 1
+console.log(compareVersions('2.3.4', '2.3.5'));    // -1
+console.log(compareVersions('1.a', '1'));          // null
+console.log(compareVersions('.1', '1'));           // null
+console.log(compareVersions('1.', '2'));           // null
+console.log(compareVersions('1..0', '2.0'));       // null
+console.log(compareVersions('1.0', '1.0.0'));      // 0
+console.log(compareVersions('1.0.0', '1.1'));      // -1
+console.log(compareVersions('1.0', '1.0.5'));      // -1

@@ -5,7 +5,7 @@ const MINUTES_PER_DAY = HOURS_PER_DAY * MINUTES_PER_HOUR;
 function afterMidnight(time) {
   const date = new Date(`1/1/2000 ${time}`);
   const hours = date.getHours();
-  const minutes = date.getMinutes
+  const minutes = date.getMinutes();
   const totalMinutes = minutes + (hours * MINUTES_PER_HOUR);
 
   return totalMinutes;
