@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Adding Schedules Exercise</title>
+  <script src="adding_schedules.js"></script>
+</head>
+<body>
+  <div id="add-more-schedules">
+    <button type="button">Add more schedules</button>
+  </div>
+  <div id="form-wrapper">
+    <form method="post" action="/api/schedules">
+      <fieldset name="schedule-1">
+        <legend>Schedule 1</legend>
+        <label for="staff_id">Staff Name: </label>
+        <select id="staff_id" name="staff_id"></select>
+        <br>
+        <label for="date">Date: </label>
+        <input id="date" type="text" name="date" placeholder="mm-dd-yy">
+        <br>
+        <label for="time">Time: </label>
+        <input id="time" type="text" name="time" placeholder="hh:mm">
+        <br>
+      </fieldset>
+      <input type="submit">
+    </form>
+  </div>
+</body>
+</html>

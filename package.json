@@ -1,0 +1,22 @@
+{
+  "name": "launchschool",
+  "version": "1.0.0",
+  "description": "This repository is for running Launch School practice problems and exercises.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wayneoco/launchschool.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wayneoco/launchschool/issues"
+  },
+  "homepage": "https://github.com/wayneoco/launchschool#readme",
+  "devDependencies": {
+    "eslint": "^8.18.0"
+  }
+}

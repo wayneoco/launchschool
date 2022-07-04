@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Space Design | Team</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1.0" />
+    <link rel="stylesheet" href="site.css" />
+    <style>
+      #modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        top:0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0,0,0,0.4);
+      }
+
+      #modal-content {
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 50px;
+        border: 1px solid #ccc;
+        width: 80%;
+        max-width: 740px;
+      }
+
+      #modal-content #close {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      #modal-content #identity {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      #modal-content #identity img {
+        margin-right: 30px;
+      }
+
+      #modal-content #bio {
+        text-align: left;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script src="javascripts/team.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="home.html">SpaceDesign</a>
+      </h1>
+      <nav>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="team.html" class="active">Team</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <div id="team" class="column">
+        <article>
+          <h2>Team</h2>
+          <div id="team-bio">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniadolor</p>
+          </div>
+          <div id="team-members">
+            <ul>
+              <li>
+                <a href="#" data-team="kevin">
+                  <img src="images/img_kevin.jpg" alt="Kevin Wang" />
+                  Kevin
+                </a>
+              </li>
+              <li>
+                <a href="#" data-team="louis">
+                  <img src="images/img_louis.jpg" alt="Louis Burton" />
+                  Louis
+                </a>
+              </li>
+              <li>
+                <a href="#" data-team="kasper">
+                  <img src="images/img_kasper.jpg" alt="Kasper Salto" />
+                  Kasper
+                </a>
+              </li>
+              <li>
+                <a href="#" data-team="chris">
+                  <img src="images/img_chris.jpg" alt="Chris Lee" />
+                  Chris
+                </a>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </main>
+    <div id="modal">
+    </div>
+    <script id="modal-template" type="text/x-handlebars">
+      <div id="modal-content">
+        <div id="close">
+          <a id="modal-close" href="#">
+            <img src="images/icon_close.png" alt="Close Model" />
+          </a>
+        </div>
+        <div id="identity">
+          <h3>{{firstName}} {{lastName}}</h2>
+          <img src="images/img_{{firstName}}.jpg" alt="{{firstName}} {{lastName}}" />
+        </div>
+        <div id="bio">
+          <p>{{bio}}</p>
+        </div>
+      </div>
+    </script>
+    <footer>
+      <p>
+        Lorem ipsum dolor sit amet, consectetu
+        <br />
+        incididunt ut labore et dolore magna aliqua. Ut enim ad
+      </p>
+      <ul>
+        <li><a href="#" class="twitter">Twitter</a></li>
+        <li><a href="#" class="facebook">Facebook</a></li>
+        <li><a href="#" class="email">Email</a></li>
+        <li><a href="#" class="instagram">Instagram</a></li>
+      </ul>
+    </footer>
+  </body>
+</html>

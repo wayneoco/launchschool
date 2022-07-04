@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Booking Schedules Exercise</title>
+  <script src="booking_schedules.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    fieldset {
+      margin-bottom: 2em;
+      border:none;
+    }
+    legend {
+      margin-bottom: .2em;
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+    br {
+      margin-bottom: .5em;
+    }
+  </style>
+</head>
+<body>
+  <div id="book-schedule">
+    <form id="add-schedule" method="post" action="/api/schedules">
+      <fieldset id="schedule">
+        <legend>Schedules</legend>
+        <label for="id">Please select one schedule: </label>
+        <select id="id" name="id"></select><br />
+        <label for="student_email">Email: </label>
+        <input id="student_email" type="email" name="student_email" required=""><br />
+        <input type="submit" value="Submit"><br />
+      </fieldset>
+    </form>
+  </div>
+</body>
+</html>
