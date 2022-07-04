@@ -20,14 +20,12 @@ class Game {
   })();
 
   constructor() {
-    this.word = this.constructor.randomWord();
-    this.wordKey = this.generateWordKey();
-    this.wordLetters = this.word.split('');
+    this.wordLetters = this.constructor.randomWord().split('');
     this.guessCount = 0;
     this.guessedLetters = [];
 
-    if (this.word) {
-      this.remainingCharsToWin = this.word.length;
+    if (this.wordLetters[0]) {
+      this.remainingCharsToWin = this.wordLetters.length;
     }
 
     this.body = document.querySelector('body');
@@ -38,23 +36,11 @@ class Game {
     this.apples = document.querySelector('#apples');
     this.message = document.querySelector('#message');
     this.playAgainLink = document.querySelector('#play-again a');
-
     this.generateWordBlanks();
-    this.updateAppleGuessClass();
-  }
-
-  generateWordKey() {
-    const reference = {};
-
-    for (let index = 0; index < this.word.length; index += 1) {
-      reference[index] = this.word[index];
-    }
-
-    return reference;
   }
 
   generateWordBlanks() {
-    const numberOfBlanks = this.word.length;
+    const numberOfBlanks = this.wordLetters.length;
 
     for (let index = 0; index < numberOfBlanks; index += 1) {
       const letterBlank = document.createElement('span');
@@ -64,18 +50,10 @@ class Game {
     }
   }
 
-  incrementGuessCount() {
-    this.guessCount += 1;
-  }
-
-  trackGuessedLetter(letter) {
-    this.guessedLetters.push(letter);
-  }
-
   displayMatchedLetter(letter) {
     const self = this;
-    const matchedIds = Object.keys(this.wordKey).filter(key => {
-      return self.wordKey[key] === letter;
+    const matchedIds = Object.keys(this.wordLetters).filter(key => {
+      return self.wordLetters[key] === letter;
     });
 
     matchedIds.forEach(id => {
@@ -91,9 +69,7 @@ class Game {
   }
 
   updateAppleGuessClass() {
-    const applesCurrentClass = this.apples.getAttribute('class');
-    const applesNewClass = `guess_${this.guessCount}`;
-    this.apples.classList.replace(applesCurrentClass, applesNewClass);
+    this.apples.className = `guess_${this.guessCount}`;
   }
 
   checkGameResult() {
@@ -122,19 +98,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const handleKeyupEvent = (e) => {
     e.preventDefault();
     const letter = e.key;
-    if (!/^[a-z]$/i.test(letter)) return;
 
-    if (game.wordLetters.includes(letter)) {
+    // if a non-alphabetic key is pressed, or the body element has a win or lose class
+    // (i.e, the game is over), don't execute the rest of the event handler.
+    // this prevents the guess row from continuing to populate with additional keypresses.
+    if (!/^[a-z]$/i.test(letter) || game.body.className) return;
+
+    // if a key matches a letter in the target word, and the key hasn't already been pressed,
+    // display the matched letter and decrement the count of remaining characters needed to win
+    if (game.wordLetters.includes(letter) && !game.guessedLetters.includes(letter)) {
       const letterMatchCount = game.wordLetters.filter(char => char === letter).length;
       game.displayMatchedLetter(letter);
       game.remainingCharsToWin -= letterMatchCount;
     }
 
+    // if a key hasn't already been guessed, display the letter in the guess row, track the letter,
+    // increment the guess count and update the apples guess class
     if (!game.guessedLetters.includes(letter)) {
       game.displayGuessedLetter(letter);
-      game.trackGuessedLetter(letter);
-      game.incrementGuessCount();
+      game.guessedLetters.push(letter);
       game.updateAppleGuessClass();
+      game.guessCount += 1;
     }
 
     game.checkGameResult();
