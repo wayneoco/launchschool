@@ -255,12 +255,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   photos = new Photos();
   await photos.init();
 
+  const firstPhoto = photos.photos[0];
+
   slideshow = new Slideshow();
   slideshow.init();
 
-  likesAndFavorites = new LikesAndFavorites(photos.photos[0].id);
+  likesAndFavorites = new LikesAndFavorites(firstPhoto);
   likesAndFavorites.init();
 
-  comments = new Comments(photos.photos[0].id);
+  comments = new Comments(firstPhoto);
   comments.init();
 });
