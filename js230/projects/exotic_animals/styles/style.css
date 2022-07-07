@@ -1,0 +1,71 @@
+body {
+  background-color: rgb(41, 45, 61);
+}
+
+h1 {
+  margin: 0 auto;
+  text-align: center;
+  color: #fff;
+  width: 100%;
+}
+
+.grid-container {
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 10px;
+  max-width: 90%;
+}
+
+.grid-item {
+  margin: 0 auto;
+  padding: 10px;
+  display: grid;
+  z-index: 0;
+}
+
+img {
+  border: 10px solid white;
+  border-radius: 7px;
+  justify-self: center;
+  max-width: 90%;
+}
+
+figcaption {
+  position: relative;
+  margin: -100px auto 0 auto;
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 7px;
+  color: white;
+  max-width: 90%;
+}
+
+figcaption.hide {
+  display: none;
+  animation: fadeOut 2s;
+}
+
+figcaption.show {
+  display: block;
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
